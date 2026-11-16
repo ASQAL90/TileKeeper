@@ -1,0 +1,27 @@
+# Normalisasi akhir baris: simpan LF di repository, checkout LF di semua OS.
+* text=auto eol=lf
+
+# Biner — jangan diubah/dinormalisasi
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.zip   binary
+*.7z    binary
+*.exe   binary
+*.dll   binary
+*.pdb   binary
+*.pptx  binary
+*.pdf   binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+
+# Skrip dan konfigurasi wajib LF
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# Berkas sumber .NET (cs/csproj/sln/resx) sengaja LF:
+# aman untuk MSBuild/VS 2022 dan menghindari noise CRLF saat checkout di Linux/Termux.

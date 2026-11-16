@@ -1,0 +1,1112 @@
+﻿<!doctype html>
+<title>TileKeeper Guide</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+/>
+<style>
+  :root {
+    --paper: #f3f5f8;
+    --surface: #ffffff;
+    --surface-alt: #e9edf3;
+    --line: #d5dce6;
+    --ink: #1b2733;
+    --ink-soft: #4b5a6b;
+    --ink-faint: #7c8ba0;
+    --accent: #0057b8;
+    --accent-strong: #00408a;
+    --accent-tint: #e3edfb;
+    --accent-ink: #ffffff;
+    --warn: #e68a00;
+    --warn-tint: #fdf0dd;
+    --danger: #b50000;
+    --danger-tint: #fbe3e3;
+    --good: #1f7a4c;
+    --good-tint: #e2f3e9;
+    --code-bg: #eef1f6;
+    --shadow: 0 1px 2px rgba(27, 39, 51, 0.06), 0 8px 24px rgba(27, 39, 51, 0.06);
+    --font-display: "IBM Plex Sans", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #12181f;
+      --surface: #1a222c;
+      --surface-alt: #212b37;
+      --line: #2e3a48;
+      --ink: #e8edf3;
+      --ink-soft: #9fb0c2;
+      --ink-faint: #6c7d90;
+      --accent: #4c9fff;
+      --accent-strong: #78b6ff;
+      --accent-tint: #16273d;
+      --accent-ink: #0b1520;
+      --warn: #ffb454;
+      --warn-tint: #33260f;
+      --danger: #ff6b6b;
+      --danger-tint: #331414;
+      --good: #4ade94;
+      --good-tint: #123321;
+      --code-bg: #212b37;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #12181f;
+    --surface: #1a222c;
+    --surface-alt: #212b37;
+    --line: #2e3a48;
+    --ink: #e8edf3;
+    --ink-soft: #9fb0c2;
+    --ink-faint: #6c7d90;
+    --accent: #4c9fff;
+    --accent-strong: #78b6ff;
+    --accent-tint: #16273d;
+    --accent-ink: #0b1520;
+    --warn: #ffb454;
+    --warn-tint: #33260f;
+    --danger: #ff6b6b;
+    --danger-tint: #331414;
+    --good: #4ade94;
+    --good-tint: #123321;
+    --code-bg: #212b37;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  code, kbd {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-wrap: balance;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 272px minmax(0, 1fr);
+    max-width: 1180px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  /* ── Sidebar ─────────────────────────────────────────────── */
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 28px 20px 40px 28px;
+    border-right: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .brand-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .brand-sub {
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+
+  .version-pill {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 3px 9px;
+    border-radius: 100px;
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  nav {
+    margin-top: 26px;
+  }
+
+  .nav-group {
+    margin-bottom: 20px;
+  }
+
+  .nav-group-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin: 0 0 8px;
+  }
+
+  .nav-group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-group li { margin: 1px 0; }
+
+  .nav-group a {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-group a:hover {
+    background: var(--surface-alt);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* ── Main content ────────────────────────────────────────── */
+
+  main {
+    padding: 44px 48px 120px;
+    min-width: 0;
+  }
+
+  .doc-header {
+    margin-bottom: 44px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+
+  .doc-header h1 {
+    font-size: 38px;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  .doc-header p.lede {
+    margin-top: 14px;
+    max-width: 62ch;
+    font-size: 17px;
+    color: var(--ink-soft);
+  }
+
+  section.chapter {
+    margin-bottom: 56px;
+    padding-top: 6px;
+    scroll-margin-top: 24px;
+  }
+
+  section.chapter > h2 {
+    font-size: 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 22px;
+  }
+
+  section.chapter > h2 .chap-num {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink-faint);
+  }
+
+  h3.sub {
+    font-size: 17px;
+    margin: 30px 0 12px;
+  }
+
+  p { max-width: 68ch; margin: 0 0 14px; color: var(--ink); }
+  p.tight { max-width: none; }
+
+  ul.plain, ol.plain {
+    max-width: 68ch;
+    padding-left: 22px;
+    margin: 0 0 16px;
+  }
+  ul.plain li, ol.plain li { margin-bottom: 8px; }
+
+  strong { font-weight: 600; }
+
+  /* ── Callouts ────────────────────────────────────────────── */
+
+  .callout {
+    display: flex;
+    gap: 12px;
+    max-width: 68ch;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    margin: 18px 0;
+  }
+  .callout .tag {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 5px;
+    height: fit-content;
+    white-space: nowrap;
+  }
+  .callout p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+  .callout.tip { border-left: 3px solid var(--accent); }
+  .callout.tip .tag { background: var(--accent-tint); color: var(--accent-strong); }
+  .callout.warn { border-left: 3px solid var(--warn); }
+  .callout.warn .tag { background: var(--warn-tint); color: var(--warn); }
+  .callout.danger { border-left: 3px solid var(--danger); }
+  .callout.danger .tag { background: var(--danger-tint); color: var(--danger); }
+  .callout.good { border-left: 3px solid var(--good); }
+  .callout.good .tag { background: var(--good-tint); color: var(--good); }
+
+  /* ── Step list ───────────────────────────────────────────── */
+
+  .steps { max-width: 68ch; margin: 0 0 20px; padding: 0; list-style: none; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 2px 0 18px 40px;
+    border-left: 1px solid var(--line);
+    margin-left: 15px;
+  }
+  .steps li:last-child { border-color: transparent; padding-bottom: 0; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+  }
+  .steps li strong.step-title {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--ink);
+  }
+  .steps li p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+
+  /* ── Mockup panels (representative, not real screenshots) ── */
+
+  .mockup {
+    max-width: 68ch;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin: 20px 0 26px;
+  }
+  .mockup-titlebar {
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--line);
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+  .mockup-body { padding: 16px; }
+  .mockup-caption {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    padding: 8px 16px 12px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .fake-tabs { display: flex; gap: 2px; margin-bottom: 12px; }
+  .fake-tab {
+    font-size: 12.5px;
+    padding: 6px 14px;
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: var(--surface-alt);
+    color: var(--ink-faint);
+  }
+  .fake-tab.active {
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+    border-bottom: 1px solid var(--surface);
+    margin-bottom: -1px;
+  }
+
+  .fake-list {
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--surface);
+    font-size: 12.5px;
+    margin-bottom: 10px;
+  }
+  .fake-list .row {
+    display: flex;
+    gap: 10px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-mono);
+  }
+  .fake-list .row:last-child { border-bottom: none; }
+  .fake-list .row.head {
+    background: var(--surface-alt);
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .fake-list .row .c1 { flex: 1 1 55%; color: var(--ink); }
+  .fake-list .row .c2 { flex: 1 1 45%; color: var(--ink-faint); }
+
+  .fake-btn-row { display: flex; gap: 6px; }
+  .fake-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: none;
+    color: #fff;
+    font-family: var(--font-body);
+  }
+  .fake-btn.blue { background: #0057b8; }
+  .fake-btn.red { background: #b50000; }
+  .fake-btn.amber { background: #e68a00; }
+  .fake-btn.grey { background: #6b7684; }
+
+  .fake-checklist { border: 1px solid var(--line); border-radius: 5px; padding: 6px 8px; font-size: 12.5px; background: var(--surface); }
+  .fake-checklist .item { display: flex; align-items: center; gap: 6px; padding: 3px 2px; color: var(--ink); }
+  .fake-checklist .box { width: 12px; height: 12px; border: 1.5px solid var(--ink-faint); border-radius: 2px; flex-shrink: 0; }
+  .fake-checklist .box.on { background: var(--accent); border-color: var(--accent); }
+  .fake-checklist .item.filled  { background: var(--accent); color: var(--accent-ink); border-radius: 3px; }
+  .fake-checklist .item.filled2 { background: #c98a00; color: #fff; border-radius: 3px; }
+
+  .fake-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 3px;
+    height: 90px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 4px;
+    background: var(--surface-alt);
+  }
+  .fake-grid .cell {
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: 3px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+  }
+  .fake-grid .cell.filled { background: var(--accent); color: var(--accent-ink); border-style: solid; font-weight: 600; }
+  .fake-grid .cell.filled2 { background: #c98a00; color: #fff; border-style: solid; font-weight: 600; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 68ch;
+  }
+
+  /* ── Tables ──────────────────────────────────────────────── */
+
+  .table-wrap { max-width: 68ch; overflow-x: auto; margin: 0 0 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); font-weight: 500; }
+  td code { white-space: nowrap; }
+
+  hr.chapter-end { border: none; border-top: 1px solid var(--line); max-width: 68ch; margin: 40px 0; }
+
+  footer.page-footer {
+    max-width: 68ch;
+    color: var(--ink-faint);
+    font-size: 13px;
+    margin-top: 30px;
+  }
+
+  @media (max-width: 880px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+    main { padding: 32px 22px 80px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">PT</div>
+      <div>
+        <div class="brand-text">TileKeeper</div>
+        <div class="brand-sub">USER GUIDE</div>
+      </div>
+    </div>
+    <span class="version-pill">v24.10.0.1</span>
+
+    <nav>
+      <div class="nav-group">
+        <p class="nav-group-label">Getting started</p>
+        <ul>
+          <li><a href="#what-is-it">What this program does</a></li>
+          <li><a href="#quick-start">Five-minute quick start</a></li>
+          <li><a href="#accessibility">Choose a setup that fits your needs</a></li>
+          <li><a href="#tray">Finding it in the system tray</a></li>
+          <li><a href="#layout">The three tabs, at a glance</a></li>
+          <li><a href="#how-it-works">How the automatic checks work</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <p class="nav-group-label">Programs tab</p>
+        <ul>
+          <li><a href="#adding-programs">Adding a program</a></li>
+          <li><a href="#keep-running">Keep Running</a></li>
+          <li><a href="#same-exe">Same program, different arguments</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <p class="nav-group-label">Position tab</p>
+        <ul>
+          <li><a href="#position-list">Programs to Position</a></li>
+          <li><a href="#screens">Assigning screens</a></li>
+          <li><a href="#grid">Pinning to a grid cell</a></li>
+          <li><a href="#match-largest">Match Largest Window</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <p class="nav-group-label">System tab</p>
+        <ul>
+          <li><a href="#resolution">Display resolution hold</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <p class="nav-group-label">Reference</p>
+        <ul>
+          <li><a href="#walkthrough">Full walkthrough example</a></li>
+          <li><a href="#troubleshooting">Troubleshooting</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="doc-header">
+      <p class="eyebrow">Beginner's guide</p>
+      <h1>Getting the most out of TileKeeper</h1>
+      <p class="lede">
+        TileKeeper keeps the programs you rely on open, running, and sitting in the right
+        place on your screens &mdash; automatically. This guide walks through every screen in plain
+        language, assuming you've never opened the settings window before.
+      </p>
+    </div>
+
+    <section class="chapter" id="quick-start">
+      <h2><span class="chap-num">02</span> Five-minute quick start</h2>
+      <p>If you only want the shortest path to a working setup, follow these steps in order. You can read the detailed explanations below afterward.</p>
+      <ol class="steps">
+        <li><strong class="step-title">Start TileKeeper</strong><p>Open <code>TileKeeper.exe</code>. Look near the Windows clock for its tray icon.</p></li>
+        <li><strong class="step-title">Open the settings</strong><p>Right-click the tray icon and choose <strong>Show</strong>.</p></li>
+        <li><strong class="step-title">Add one program</strong><p>On <strong>Programs</strong>, click <strong>Add...</strong> and select the program shortcut or executable you want TileKeeper to watch.</p></li>
+        <li><strong class="step-title">Choose automatic restart</strong><p>Check <strong>Enable Keep Running</strong>. Leave the cycle at about 20 seconds for your first test.</p></li>
+        <li><strong class="step-title">Choose the destination</strong><p>Open <strong>Position</strong>, check the program under the monitor where you want it to appear, and leave <strong>AutoFit</strong> checked.</p></li>
+        <li><strong class="step-title">Save and test</strong><p>Click <strong>Save</strong>. Close the watched program, wait for the cycle, and confirm that TileKeeper starts it again.</p></li>
+      </ol>
+      <div class="callout good"><span class="tag">Success</span><p>You have completed the basic setup when the program relaunches and returns to the chosen monitor. Add more programs or change the grid only after this first test works.</p></div>
+    </section>
+
+    <section class="chapter" id="how-it-works">
+      <h2><span class="chap-num">03</span> How the automatic checks work</h2>
+      <p>TileKeeper works quietly in the background. It does not replace Windows or control every application; it only acts on entries you configure.</p>
+      <div class="two-col">
+        <div class="callout tip"><span class="tag">Keep Running</span><p>Checks whether each program-list entry is running. If it is closed, TileKeeper launches that entry again.</p></div>
+        <div class="callout tip"><span class="tag">Position</span><p>Looks for the matching window and moves it to the screen and grid cell you selected.</p></div>
+      </div>
+      <ol class="steps">
+        <li><strong class="step-title">Wait for the cycle</strong><p>The cycle value is measured in seconds. A value of 20 means TileKeeper checks approximately every 20 seconds.</p></li>
+        <li><strong class="step-title">Identify the entry</strong><p>Each configured item is tracked separately. Two shortcuts to the same executable can represent different connections when their arguments differ.</p></li>
+        <li><strong class="step-title">Apply the rule</strong><p>A closed program may be launched; an open matching window may be moved or resized when custom positioning is enabled.</p></li>
+      </ol>
+      <div class="callout warn"><span class="tag">Important</span><p>TileKeeper cannot repair a broken shortcut, missing executable, blocked network connection, or application crash caused by the application itself. It can try to launch the configured entry again.</p></div>
+    </section>
+
+    <section class="chapter" id="accessibility">
+      <h2><span class="chap-num">04</span> A setup style that works for everyone</h2>
+      <p>TileKeeper can be used for control rooms, remote support, home offices, classrooms, accessibility setups, and any workspace where windows should return to predictable places.</p>
+      <div class="table-wrap"><table><thead><tr><th>Need</th><th>Recommended approach</th></tr></thead><tbody>
+        <tr><td>Large monitoring display</td><td>Use <strong>AutoFit</strong> and <strong>Borderless</strong> so each window fills its tile.</td></tr>
+        <tr><td>Normal desktop work</td><td>Leave <strong>Borderless</strong> unchecked if you need title bars and ordinary window controls.</td></tr>
+        <tr><td>Several remote sessions</td><td>Use separate shortcuts with clear names and different connection arguments; pin important sessions to cells.</td></tr>
+        <tr><td>Program started manually</td><td>Add it to the Position-only list so TileKeeper places it without launching it.</td></tr>
+        <tr><td>Changing monitors frequently</td><td>Save assignments for each screen and reconnect displays before testing the layout.</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section class="chapter" id="what-is-it">
+      <h2><span class="chap-num">01</span> What this program does</h2>
+      <p>
+        Think of it as a caretaker for your other programs. You tell it which programs matter
+        (a SCADA viewer, a VNC session, a monitoring app &mdash; anything with an <code>.exe</code>),
+        and it does two jobs for you in the background, all day, without you touching it:
+      </p>
+      <ul class="plain">
+        <li><strong>Keep Running</strong> &mdash; if one of those programs closes or crashes, it gets
+          relaunched automatically, on a timer you choose.</li>
+        <li><strong>Position</strong> &mdash; each program's window gets moved back to the monitor and
+          screen area you assigned it, even if someone drags it out of place.</li>
+      </ul>
+      <p>
+        Everything is configured from one settings window, split into three tabs:
+        <strong>Programs</strong>, <strong>Position</strong>, and <strong>System</strong>.
+      </p>
+    </section>
+
+    <section class="chapter" id="tray">
+      <h2><span class="chap-num">02</span> Finding it in the system tray</h2>
+      <p>
+        TileKeeper doesn't live on your taskbar. Once it's running, it sits quietly in the
+        system tray (the small icons near your clock, bottom-right of the screen).
+      </p>
+      <ol class="steps">
+        <li>
+          <strong class="step-title">Find the icon</strong>
+          <p>Look in the system tray. If you don't see it, click the small <strong>^</strong> arrow to
+          show hidden tray icons.</p>
+        </li>
+        <li>
+          <strong class="step-title">Right-click it</strong>
+          <p>A small menu appears with two options: <strong>Show</strong> and <strong>Exit</strong>.</p>
+        </li>
+        <li>
+          <strong class="step-title">Click Show</strong>
+          <p>The settings window opens. Whatever changes you made previously are already loaded in.</p>
+        </li>
+      </ol>
+      <div class="callout warn">
+        <span class="tag">Note</span>
+        <p>
+          Closing the settings window with the <strong>X</strong> button does <em>not</em> stop the
+          program &mdash; it just minimizes back to the tray, so Keep Running and Position keep working.
+          To fully stop the program, use <strong>Exit</strong> from the tray menu &mdash; this build has
+          <strong>no exit password</strong>, so Exit stops the program immediately.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="layout">
+      <h2><span class="chap-num">03</span> The three tabs, at a glance</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tab</th><th>What it's for</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Programs</strong></td>
+              <td>The master list of programs this app should watch and relaunch if closed.</td>
+            </tr>
+            <tr>
+              <td><strong>Position</strong></td>
+              <td>Which monitor (and which spot on that monitor) each program's window belongs on.</td>
+            </tr>
+            <tr>
+              <td><strong>System</strong></td>
+              <td>Display resolution hold. This build has no exit password and no NQVM service monitor.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        At the very bottom of the window, two buttons apply to everything: <strong>Save</strong> writes
+        all your changes and closes back to the tray; <strong>Clear</strong> wipes every list and
+        setting back to blank (used to start over, not for everyday use).
+      </p>
+    </section>
+
+    <hr class="chapter-end" />
+
+    <section class="chapter" id="adding-programs">
+      <h2><span class="chap-num">04</span> Adding a program</h2>
+      <p>
+        Open the <strong>Programs</strong> tab. This is a plain list &mdash; one row per program &mdash;
+        with five buttons underneath it.
+      </p>
+
+      <div class="mockup">
+        <div class="mockup-titlebar"><span>TileKeeper Program</span><span>Programs</span></div>
+        <div class="mockup-body">
+          <div class="fake-tabs">
+            <div class="fake-tab active">Programs</div>
+            <div class="fake-tab">Position</div>
+            <div class="fake-tab">System</div>
+          </div>
+          <div class="fake-list">
+            <div class="row head"><div class="c1">Program</div><div class="c2">Path / Command</div></div>
+            <div class="row"><div class="c1">viewer.exe session-a</div><div class="c2">C:\Tools</div></div>
+            <div class="row"><div class="c1">tvnviewer.exe 192.0.2.10:5900</div><div class="c2">C:\Program Files\TightVNC</div></div>
+          </div>
+          <div class="fake-btn-row">
+            <span class="fake-btn blue">Add...</span>
+            <span class="fake-btn blue">Edit...</span>
+            <span class="fake-btn red">Remove</span>
+            <span class="fake-btn grey">Up</span>
+            <span class="fake-btn grey">Down</span>
+          </div>
+        </div>
+        <div class="mockup-caption">Representative layout &mdash; your list will show the programs you've added.</div>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <strong class="step-title">Click Add...</strong>
+          <p>A file picker opens, already filtered to shortcut and program files
+          (<code>.lnk</code>, <code>.appref-ms</code>, <code>.rdp</code>, <code>.vnc</code>,
+          <code>.exe</code>).</p>
+        </li>
+        <li>
+          <strong class="step-title">Pick the program</strong>
+          <p>Choose a desktop shortcut, a ClickOnce application, a Remote Desktop file, a VNC
+          connection file, or the program's <code>.exe</code> directly. You can select several at
+          once. A <code>.vnc</code> file launches through whichever VNC viewer Windows already
+          has associated with that extension &mdash; no extra setup needed.</p>
+        </li>
+        <li>
+          <strong class="step-title">Check the new row</strong>
+          <p>It's added to the list with a name (used to recognize the running window) and its
+          launch path.</p>
+        </li>
+      </ol>
+
+      <h3 class="sub">Editing, removing, and reordering</h3>
+      <ul class="plain">
+        <li><strong>Edit...</strong> &mdash; select a row first, then re-pick its file to change what it points to.</li>
+        <li><strong>Remove</strong> &mdash; select one or more rows, then click to delete them from the list.</li>
+        <li><strong>Up</strong> / <strong>Down</strong> &mdash; move the selected row. Order matters when
+          several unpinned programs share a screen (see <a href="#grid">Pinning to a grid cell</a>).</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="tag">Tip</span>
+        <p>
+          You can't accidentally add TileKeeper itself to this list &mdash; the app blocks that,
+          since watching and repositioning itself would cause problems.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="keep-running">
+      <h2><span class="chap-num">05</span> Keep Running</h2>
+      <p>
+        At the top of the Programs tab is a checkbox: <strong>Enable Keep Running</strong>, with a
+        <strong>Cycle (seconds)</strong> field next to it.
+      </p>
+      <ul class="plain">
+        <li>When checked, the app checks every program in your list on a timer.</li>
+        <li>If a program isn't running, it launches it again automatically.</li>
+        <li><strong>Cycle (seconds)</strong> sets how often that check happens &mdash; a lower number
+          reacts faster but checks more often; 15&ndash;30 seconds is a reasonable default.</li>
+      </ul>
+      <div class="callout good">
+        <span class="tag">Good to know</span>
+        <p>
+          This only relaunches a program that's completely closed. It never interferes with a program
+          that's still open and running &mdash; even if its window is minimized or hidden.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="same-exe">
+      <h2><span class="chap-num">06</span> Same program, different arguments</h2>
+      <p>
+        A common case: you connect to several remote computers using the <em>same</em> viewer program,
+        just with a different address each time &mdash; two VNC sessions, or two instances of a plant
+        floor tool pointed at different equipment. TileKeeper treats each of these as its own,
+        separately tracked entry.
+      </p>
+      <div class="two-col">
+        <div class="fake-list" style="margin:0;">
+          <div class="row head"><div class="c1">Program</div></div>
+          <div class="row"><div class="c1">viewer.exe ... A</div></div>
+        </div>
+        <div class="fake-list" style="margin:0;">
+          <div class="row head"><div class="c1">Program</div></div>
+          <div class="row"><div class="c1">viewer.exe ... B</div></div>
+        </div>
+      </div>
+      <p style="margin-top:14px;">
+        If you close only the <code>...A</code> window, Keep Running relaunches <em>only</em> that one
+        &mdash; the still-open <code>...B</code> window is left alone. The Position tab shows both as
+        separate, clearly labeled entries too, so you can send each to a different screen.
+      </p>
+    </section>
+
+    <hr class="chapter-end" />
+
+    <section class="chapter" id="position-list">
+      <h2><span class="chap-num">07</span> Programs to Position</h2>
+      <p>
+        Open the <strong>Position</strong> tab. Near the top is its own small list, titled
+        <strong>Programs to Position</strong> (added here are not launched by Keep Running)&mdash;a
+        second way to add a program, used only for window placement.
+      </p>
+      <div class="callout tip">
+        <span class="tag">When to use this</span>
+        <p>
+          Use the <strong>Programs</strong> tab's list for anything you want auto-relaunched. Use this
+          Position-only list for something you always start by hand, but still want positioned
+          correctly once it's open &mdash; it never gets launched or restarted by this app.
+        </p>
+      </div>
+      <p>
+        It has the same Add / Edit / Remove / Up / Down buttons as the Programs tab. Every program you
+        add &mdash; from either list &mdash; becomes available to check off in the four screen lists
+        below it.
+      </p>
+      <div class="callout tip">
+        <span class="tag">Checkbox</span>
+        <p>
+          Each row's checkbox is the <strong>Match Largest Window</strong> flag (see below), not a
+          row selector. Checking it also selects the row (highlighted), so Edit/Remove/Up/Down
+          apply to it right away without an extra click. Unchecking a row leaves the current
+          selection alone.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="screens">
+      <h2><span class="chap-num">08</span> Assigning screens</h2>
+      <p>
+        Below the program lists are four boxes: <strong>Screen 1</strong> through <strong>Screen 4</strong>,
+        one per physical monitor. When a screen's monitor isn't currently connected, only its
+        <strong>Rows</strong>/<strong>Cols</strong>/<strong>AutoFit</strong>/grid preview gray out
+        &mdash; plug the monitor in and those light up on their own, no restart needed. The
+        program checklist itself always stays clickable, even for a disconnected screen, so you
+        can check, uncheck, or reassign a program off it at any time without needing that monitor
+        plugged in.
+      </p>
+      <div class="mockup">
+        <div class="mockup-titlebar"><span>Screen 1</span><span>checklist + grid</span></div>
+        <div class="mockup-body">
+          <div style="display:flex; gap:14px;">
+            <div class="fake-checklist" style="flex:1;">
+              <div class="item filled"><span class="box on"></span>(1)&nbsp; viewer.exe (...A)</div>
+              <div class="item filled2"><span class="box on"></span>(2)&nbsp; tvnviewer (192.0.2.10)</div>
+              <div class="item"><span class="box"></span> viewer.exe (...B)</div>
+            </div>
+            <div class="fake-grid" style="flex:1;">
+              <div class="cell filled">1</div><div class="cell filled2">2</div><div class="cell">&ndash;</div>
+              <div class="cell">&ndash;</div><div class="cell">&ndash;</div><div class="cell">&ndash;</div>
+            </div>
+          </div>
+        </div>
+        <div class="mockup-caption">Each checked row shows the number and fill colour of the grid cell it landed in.</div>
+      </div>
+      <ul class="plain">
+        <li>Check a program's box to assign it to that screen.</li>
+        <li>Checked rows carry a number badge &mdash; <code>(1)</code>, <code>(2)</code>, &hellip; &mdash; and fill
+          with their grid-cell colour, so the checklist tracks the grid preview exactly. Numbers follow
+          the order you check the boxes (<strong>click order</strong>), not the list order: the first
+          program checked takes cell 1, the next cell 2, and so on.</li>
+        <li>A program can only be checked on <em>one</em> screen at a time &mdash; checking it here grays
+          it out on the other three.</li>
+        <li><strong>Rows</strong> / <strong>Cols</strong> set the tiling grid for that screen (leave at
+          <code>0</code> for automatic sizing based on how many programs are checked).</li>
+        <li><strong>AutoFit</strong> &mdash; when checked, every window on that screen is resized to fill
+          its tile. When unchecked, windows keep their own size and are just moved into position.</li>
+        <li><strong>Borderless</strong> &mdash; checked (the default) runs that screen's windows without a
+          title bar or border, edge-to-edge across their tiles. Unchecking switches that screen to
+          <strong>border mode</strong> (below).</li>
+      </ul>
+
+      <h3>Border mode (Borderless unchecked)</h3>
+      <p>
+        Windows keep a title bar and a thin frame but stay flush to their tile &mdash; no overlap onto
+        the neighbor, no desktop gap between windows. The change is instant: untick and the windows
+        re-frame on the next scan tick.
+      </p>
+      <ul class="plain">
+        <li>The Windows drop shadow is suppressed in this mode, so no dark translucent strip appears
+          between adjacent windows.</li>
+        <li>Adding a title bar takes ~30&nbsp;px out of the window's client area. Apps that stretch
+          their canvas to the window (typical SCADA/overview screens) rebuild their content into the
+          smaller client automatically and are unaffected. Apps that draw at a fixed canvas size will
+          have their bottom content cut off in border mode &mdash; for those, leave
+          <strong>Borderless</strong> checked instead (or make the app scale its canvas to the client
+          size).</li>
+      </ul>
+    </section>
+
+    <section class="chapter" id="grid">
+      <h2><span class="chap-num">09</span> Pinning to a grid cell</h2>
+      <p>
+        By default, checked programs fill the grid in the order you check them. If you want a
+        specific program to always land in a specific spot, click directly on that cell in the
+        grid preview.
+      </p>
+      <ol class="steps">
+        <li>
+          <strong class="step-title">Click a grid cell</strong>
+          <p>A small menu pops up listing every program checked for that screen, plus an
+          <strong>Auto-fill (clear pin)</strong> option.</p>
+        </li>
+        <li>
+          <strong class="step-title">Pick a program</strong>
+          <p>That program is now pinned to this exact cell every time the layout is applied, and
+          its checklist badge number and row fill update to match the pinned cell.</p>
+        </li>
+      </ol>
+      <div class="callout tip">
+        <span class="tag">Un-pinning</span>
+        <p><strong>Auto-fill (clear pin)</strong> removes the manual pin; the program then takes the
+          next free cell in click order like any other checked program.</p>
+      </div>
+      <div class="callout warn">
+        <span class="tag">Limit</span>
+        <p>A grid can go up to <strong>3 &times; 3 (nine cells)</strong> per screen. Saving with more
+          checked programs than cells is rejected with an explanation.</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="match-largest">
+      <h2><span class="chap-num">10</span> Match Largest Window</h2>
+      <p>
+        Some programs open more than one window &mdash; a small toolbar, a splash screen, a floating
+        panel &mdash; alongside their real, main window. Normally TileKeeper guesses which
+        window is the "main" one using the same signal Windows itself uses. For most programs, that
+        guess is right every time.
+      </p>
+      <p>
+        If you notice a small companion window getting moved or resized instead of the program's real
+        window, check the box next to that program's row in the <strong>Programs to Position</strong>
+        list. This tells TileKeeper to always pick that program's largest currently visible
+        window &mdash; almost always the one you actually want moved.
+      </p>
+      <div class="callout tip">
+        <span class="tag">Default</span>
+        <p>Leave this unchecked unless you actually see the wrong window being repositioned. It's off
+          by default for every program.</p>
+      </div>
+    </section>
+
+    <hr class="chapter-end" />
+
+    <section class="chapter" id="resolution">
+      <h2><span class="chap-num">11</span> Display resolution hold</h2>
+      <p>
+        Also on the <strong>System</strong> tab. Some displays report a resolution larger than what a
+        room actually needs, which can push windows off-screen. This section can clamp the display back
+        down to a fixed size on a timer.
+      </p>
+      <ul class="plain">
+        <li><strong>Hold display resolution</strong> &mdash; turns the clamp on or off.</li>
+        <li><strong>Width</strong> / <strong>Height</strong> &mdash; the resolution to hold.</li>
+        <li><strong>Capture current</strong> &mdash; fills Width/Height with whatever your display is
+          set to right now, so you don't have to look it up.</li>
+        <li><strong>Check (sec)</strong> &mdash; how often to re-apply it.</li>
+      </ul>
+    </section>
+
+    <hr class="chapter-end" />
+
+    <section class="chapter" id="walkthrough">
+      <h2><span class="chap-num">14</span> Full walkthrough example</h2>
+      <p>
+        Putting it together: two VNC connections to different equipment computers, kept running, and
+        tiled side by side on your second monitor.
+      </p>
+      <ol class="steps">
+        <li>
+          <strong class="step-title">Create two shortcuts</strong>
+          <p>In Windows, right-click your VNC viewer's <code>.exe</code> and choose
+          <em>Create shortcut</em>, once for each computer. Edit each shortcut's properties so its
+          <strong>Target</strong> ends with that computer's address, e.g.
+          <code>tvnviewer.exe 192.0.2.10:5900</code>.</p>
+        </li>
+        <li>
+          <strong class="step-title">Add both to the Programs tab</strong>
+          <p>Click <strong>Add...</strong>, select both shortcuts at once. They appear as two separate
+          rows, each ending in a different address.</p>
+        </li>
+        <li>
+          <strong class="step-title">Turn on Keep Running</strong>
+          <p>Check <strong>Enable Keep Running</strong>. Closing either connection now brings back only
+          that one.</p>
+        </li>
+        <li>
+          <strong class="step-title">Assign them to Screen 2</strong>
+          <p>On the Position tab, check both programs under <strong>Screen 2</strong>. Set
+          <strong>Cols</strong> to <code>2</code> so they sit side by side, and check
+          <strong>AutoFit</strong> so each fills half the screen.</p>
+        </li>
+        <li>
+          <strong class="step-title">Enable positioning and save</strong>
+          <p>Check <strong>Enable Custom Position</strong>, then click <strong>Save</strong> at the
+          bottom of the window.</p>
+        </li>
+      </ol>
+      <p>
+        From now on, both connections launch automatically, relaunch individually if either drops, and
+        snap back into their half of Screen 2 if someone drags a window out of place.
+      </p>
+    </section>
+
+    <section class="chapter" id="troubleshooting">
+      <h2><span class="chap-num">15</span> Troubleshooting</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symptom</th><th>What to check</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>A program never launches</td>
+              <td>Check <strong>Enable Keep Running</strong> is checked, and that its row's path still
+                points to a file that exists.</td>
+            </tr>
+            <tr>
+              <td>Closing one of two similar entries relaunches the wrong one</td>
+              <td>Make sure each shortcut's arguments are actually different &mdash; two shortcuts with
+                identical arguments are treated as the same entry.</td>
+            </tr>
+            <tr>
+              <td>A window won't move to its assigned screen</td>
+              <td>Confirm <strong>Enable Custom Position</strong> is checked and you clicked
+                <strong>Save</strong>. Try <strong>Match Largest Window</strong> if a small companion
+                window is being moved instead (see <a href="#match-largest">above</a>).</td>
+            </tr>
+            <tr>
+              <td>Screen 3 or 4's Rows/Cols/grid look grayed out</td>
+              <td>That monitor isn't currently detected &mdash; connect it and those controls
+                re-enable immediately. The checklist itself stays usable either way; you can
+                still check, uncheck, or reassign a program on a disconnected screen and
+                <strong>Save</strong> persists it normally.</td>
+            </tr>
+            <tr>
+              <td>Saving is rejected with a grid-size error</td>
+              <td>You've checked more programs for a screen than its grid has cells. Either increase
+                Rows/Cols, or uncheck a program.</td>
+            </tr>
+            <tr>
+              <td>Bottom strip of a window's content is cut off in border mode</td>
+              <td>That app draws at a fixed canvas size and doesn't stretch into the smaller client a
+                title bar leaves behind. Check <strong>Borderless</strong> for that screen, or make the
+                app scale its canvas to the client size.</td>
+            </tr>
+            <tr>
+              <td>Exit asks for a password</td>
+              <td>You're running the wrong build &mdash; this variant has no exit password and stops
+                immediately from the tray <strong>Exit</strong> item.</td>
+            </tr>
+            <tr>
+              <td>The configuration file was deleted or is missing</td>
+              <td>The app recreates it automatically the next time it's launched. It restarts
+                itself once so the new file takes effect &mdash; you may briefly see the tray
+                icon appear twice &mdash; then starts normally with default settings.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="chapter" id="glossary">
+      <h2><span class="chap-num">16</span> Glossary</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Keep Running</strong></td><td>Automatically relaunches a program if it isn't currently running.</td></tr>
+            <tr><td><strong>Custom Position</strong></td><td>Automatically moves a program's window back to its assigned screen and cell.</td></tr>
+            <tr><td><strong>AutoFit</strong></td><td>Resizes windows to fill their grid tile, instead of only moving them.</td></tr>
+            <tr><td><strong>Grid cell</strong></td><td>One rectangle in a screen's tiling layout; up to 3&times;3 per screen.</td></tr>
+            <tr><td><strong>Pinning</strong></td><td>Locking a specific program to a specific grid cell, instead of auto-filling.</td></tr>
+            <tr><td><strong>Position-only entry</strong></td><td>A program added on the Position tab's own list &mdash; positioned, but never launched or relaunched.</td></tr>
+            <tr><td><strong>Match Largest Window</strong></td><td>Positions a program by its biggest visible window, for programs that open extra small windows.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      TileKeeper &middot; detailed user guide &middot; Start with <a href="#quick-start">Five-minute quick start</a>, then use the left navigation for advanced setup and troubleshooting. Describes the Programs, Position, and System tabs as of v24.10.0.1.
+    </footer>
+  </main>
+</div>

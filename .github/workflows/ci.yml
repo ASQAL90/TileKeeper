@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Build aplikasi (Release, AnyCPU)
+        run: msbuild src/TileKeeper/TileKeeper.csproj /p:Configuration=Release /p:Platform=AnyCPU /m
+
+      - name: Build proyek test
+        run: msbuild tests/TileKeeper.Tests.csproj /p:Configuration=Release /p:Platform=AnyCPU /m

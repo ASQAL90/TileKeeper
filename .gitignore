@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+publish/
+dist/
+installer-output/
+
+# Artefak kompilasi & log
+*.pdb
+*.log
+*.tmp
+*.cache
+
+# Visual Studio / VS Code / Rider
+.vs/
+*.suo
+*.user
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
