@@ -2,7 +2,7 @@
 
 [![Rilis terbaru](https://img.shields.io/github/v/release/asqal90/TileKeeper?label=rilis%20terbaru)](https://github.com/asqal90/TileKeeper/releases/latest)
 [![Unduh](https://img.shields.io/badge/unduh-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/asqal90/TileKeeper/releases)
-[![Total unduhan](https://img.shields.io/github/downloads/asqal90/TileKeeper/total?label=total%20unduhan&logo=github)](https://github.com/asqal90/TileKeeper/releases)
+[![Unduhan rilis](https://img.shields.io/github/downloads/asqal90/TileKeeper/latest/total?label=unduhan%20rilis%20terbaru&logo=github)](https://github.com/asqal90/TileKeeper/releases)
 [![Situs](https://img.shields.io/badge/situs-asqal90.github.io%2FTileKeeper-2ea44f)](https://asqal90.github.io/TileKeeper/)
 [![Lisensi](https://img.shields.io/badge/lisensi-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/asqal90/TileKeeper/releases)
