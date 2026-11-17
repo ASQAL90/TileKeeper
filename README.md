@@ -31,7 +31,7 @@ Dia juga ingat di monitor dan kolom mana setiap jendela harus ditempatkan. Maksi
 - **Argument-aware**: aplikasi yang sama dengan argumen beda dianggap jendela terpisah.
 - **Largest window**: kalau satu aplikasi punya banyak jendela, pilih yang terbesar.
 
-Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun yang jendelanya perlu dijaga tetap di tempatnya.
+Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun yang jendelanya perlu dijaga tetap di tempatnya — termasuk layar Andon: papan performa, counting produksi, dashboard, dan aplikasi sejenis tampil berdampingan di satu layar, dan selalu kembali ke tempatnya meski layar dimatikan lalu dihidupkan lagi. Kalau mau jalan otomatis dari awal Windows nyala, simpan shortcut TileKeeper ke folder Startup (Win+R → `shell:startup` → tempel shortcut-nya).
 
 ## Cara pakai
 
