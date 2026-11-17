@@ -13,7 +13,13 @@ Aplikasi tray Windows yang mengingat jendela apa saja yang harus tetap berjalan 
 
 Saya kerja monitoring, salah satunya mengawasi SCADA, dan aplikasi-aplikasi monitoring saya buka lewat VNC dan RDP. Setiap kali koneksi putus dan tersambung ulang, semua aplikasi harus saya buka lagi dan ditata ulang posisinya di layar. Repetitif dan membosankan.
 
-Saya malas melakukannya, jadi saya bikin TileKeeper: dia otomatis menjalankan aplikasi/shortcut yang harus tetap berjalan, dan dia ingat di monitor dan kolom mana setiap jendela harus ditempatkan. Maksimal 9 cell (3x3) per layar, maksimal 4 layar — meskipun saya belum pernah coba di atas 2 layar, karena ga punya monitornya hehehe.
+Ide awalnya sebenarnya sederhana. Saya cuma ingin aplikasi yang mengecek berkala lewat task manager — apakah aplikasi yang harus dijaga masih jalan atau tidak. Kalau mati, dijalankan lagi. Selain itu, dia juga mengecek berkala apakah aplikasi, shortcut, VNC, atau RDP itu masih berada di posisi / petak / cell-nya.
+
+Konsep pemetaan layarnya yaitu membagi layar menjadi beberapa cell. Dari situ dicari koordinat tengahnya (atau z-index-nya), koordinat x/y, serta tinggi dan lebarnya. Setelah tahu jendela harus di mana, TileKeeper menggambar ulang form terluar (outer form) dari window aplikasi itu — bisa menghapus border, menghilangkan title bar, dan lain-lain.
+
+Cukup sederhana, tapi bermanfaat banget untuk pekerjaan saya sehari-hari.
+
+Dia juga ingat di monitor dan kolom mana setiap jendela harus ditempatkan. Maksimal 9 cell (3x3) per layar, maksimal 4 layar — meskipun saya belum pernah coba di atas 2 layar, karena ga punya monitornya hehehe.
 
 ## Cara kerjanya
 
