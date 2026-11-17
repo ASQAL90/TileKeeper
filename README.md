@@ -54,7 +54,7 @@ Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tamb
 | [TileKeeper-win.zip](https://github.com/ASQAL90/TileKeeper/releases/download/v1.0.0/TileKeeper-win.zip) | `TileKeeper.exe` + `TileKeeper.exe.config`, tanpa installer |
 | [SHA256SUMS.txt](https://github.com/ASQAL90/TileKeeper/releases/download/v1.0.0/SHA256SUMS.txt) | Checksum SHA-256 |
 
-Butuh .NET Framework 4.8. Unsigned — SmartScreen mungkin memberi peringatan pertama kali jalan. Rilis ini dibangun baru dan belum diuji di Windows; harap laporkan kalau ada yang aneh.
+Butuh .NET Framework 4.8. Unsigned — SmartScreen mungkin memberi peringatan pertama kali jalan.
 
 ## Lisensi
 
