@@ -45,6 +45,15 @@ Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun
 
 Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tambahkan dua-duanya, centang dua-duanya di layar 2, set **Cols = 2**, nyalakan **AutoFit**. Setiap reconnect, dua-duanya balik otomatis ke posisinya.
 
+## Screenshots
+
+|  |  |
+|---|---|
+| ![Programs tab](site/screenshot-programs.png) | ![Position tab](site/screenshot-position.png) |
+| Programs — daftar aplikasi yang dijaga | Position — layar 1–4, cell 3×3, AutoFit, Borderless |
+| ![System tab](site/screenshot-system.png) | ![Tray menu](site/screenshot-tray-menu.png) |
+| System — display resolution hold | Tray menu — Show, About, Exit |
+
 ## Unduh
 
 ### v1.0.0 (terbaru)
