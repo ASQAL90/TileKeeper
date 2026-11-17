@@ -1,98 +1,48 @@
 # TileKeeper
 
-[![Latest release](https://img.shields.io/github/v/release/asqal90/TileKeeper?label=latest%20release)](https://github.com/asqal90/TileKeeper/releases/latest)
-[![Download](https://img.shields.io/badge/download-Windows-0078D6?logo=windows)](https://github.com/asqal90/TileKeeper/releases/latest/download/TileKeeper-win.zip)
-[![Website](https://img.shields.io/badge/website-asqal90.github.io%2FTileKeeper-2ea44f)](https://asqal90.github.io/TileKeeper/)
+[![Rilis terbaru](https://img.shields.io/github/v/release/asqal90/TileKeeper?label=rilis%20terbaru)](https://github.com/asqal90/TileKeeper/releases/latest)
+[![Unduh](https://img.shields.io/badge/unduh-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/asqal90/TileKeeper/releases)
+[![Total unduhan](https://img.shields.io/github/downloads/asqal90/TileKeeper/total?label=total%20unduhan&logo=github)](https://github.com/asqal90/TileKeeper/releases)
+[![Situs](https://img.shields.io/badge/situs-asqal90.github.io%2FTileKeeper-2ea44f)](https://asqal90.github.io/TileKeeper/)
+[![Lisensi](https://img.shields.io/badge/lisensi-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/asqal90/TileKeeper/releases)
 
-TileKeeper is a small Windows tray app. It keeps a set of programs running and puts their windows back on the monitor and grid cell you assigned. I wrote it for VNC and RDP sessions spread over several screens, but it works the same for any normal window.
+Aplikasi tray Windows yang mengingat jendela apa saja yang harus tetap berjalan dan di mana letaknya di monitor — dan menjaga semuanya tetap begitu. Cocok buat yang suka monitoring dan malas menata ulang aplikasi berulang-ulang.
 
-**Download:** [TileKeeper-win.zip](https://github.com/asqal90/TileKeeper/releases/latest/download/TileKeeper-win.zip) for Windows 10 and 11. Needs .NET Framework 4.8.
+## Ceritanya kenapa saya bikin ini
 
-## What it does
+Saya kerja monitoring, salah satunya mengawasi SCADA, dan aplikasi-aplikasi monitoring saya buka lewat VNC dan RDP. Setiap kali koneksi putus dan tersambung ulang, semua aplikasi harus saya buka lagi dan ditata ulang posisinya di layar. Repetitif dan membosankan.
 
-- **Keep Running** checks your launch list on a timer and starts anything that has closed.
-- **Positioning** finds the matching window and moves it to the chosen monitor and cell.
-- **Tiling** can pick a layout automatically or follow the rows and columns you set, up to 3x3 per screen.
-- **Pinning** keeps a program in one cell. Unpinned entries fill the rest in order.
-- **Borderless mode** strips the window frame so tiles sit edge to edge. Border mode keeps a thin title bar.
-- **Argument-aware matching** lets you run the same executable twice with different arguments and treat them as separate entries.
-- **Largest window** matching helps with apps that open several top-level windows.
-- **Resolution hold** re-applies a display resolution on a timer if something else changes it.
-- Closing the settings window sends the app back to the tray. In this build, Exit from the tray menu stops it right away.
+Saya malas melakukannya, jadi saya bikin TileKeeper: dia otomatis menjalankan aplikasi/shortcut yang harus tetap berjalan, dan dia ingat di monitor dan kolom mana setiap jendela harus ditempatkan. Maksimal 9 cell (3x3) per layar, maksimal 4 layar — meskipun saya belum pernah coba di atas 2 layar, karena ga punya monitornya hehehe.
 
-## How it works
+## Cara kerjanya
 
-Startup lives in `Program.Main`. It opens the WinForms message loop, uses a named mutex to block a second copy, and recreates a missing `.exe.config` before restarting itself.
+- **Keep Running**: daftar aplikasi yang harus tetap hidup; kalau ada yang mati, dijalankan lagi otomatis (interval bisa diatur).
+- **Menata otomatis**: setiap jendela yang cocok dipindah ke monitor dan cell yang kamu tentukan.
+- **Tiling**: atur sendiri baris x kolom per layar (sampai 3x3) atau biarkan otomatis.
+- **Pin**: pasangkan aplikasi ke cell tertentu; sisanya mengisi berurutan.
+- **Borderless**: hilangkan title bar supaya rapat edge-to-edge.
+- **Argument-aware**: aplikasi yang sama dengan argumen beda dianggap jendela terpisah.
+- **Largest window**: kalau satu aplikasi punya banyak jendela, pilih yang terbesar.
 
-`TileKeeperForm` holds the tray icon, the settings tabs, config load/save, and the timers. The process watchdog checks the launch list. `WindowMonitor` scans the matching processes, works out a layout, then calls Win32 to restore, style, move, and resize each window. `GridMapPanel` runs the same layout code, so the preview in settings matches what you get at runtime.
+Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun yang jendelanya perlu dijaga tetap di tempatnya.
 
-## Quick start
+## Cara pakai
 
-1. Build the project or grab `TileKeeper.exe` from the release ZIP.
-2. Run it. The icon shows up in the notification area.
-3. Right-click the tray icon, then **Show**.
-4. Open the **Programs** tab, click **Add...**, and pick `.lnk`, `.appref-ms`, `.rdp`, `.vnc`, or `.exe` files.
-5. Turn on **Keep Running** and set a cycle. 15 to 30 seconds works for most setups.
-6. Open the **Position** tab, tick each program under the screen you want, then set **Rows**, **Cols**, and **AutoFit**.
-7. If you want a fixed slot, click a preview cell to pin the program. Turn on **Borderless** or **Match Largest Window** as needed.
-8. Click **Save**.
+1. Unduh `TileKeeper.exe` dari Releases (butuh .NET Framework 4.8).
+2. Jalankan; ikon muncul di tray.
+3. Klik kanan ikon → **Show**, buka tab **Programs**, klik **Add...**, dan pilih `.lnk`, `.appref-ms`, `.rdp`, `.vnc`, atau `.exe`.
+4. Nyalakan **Keep Running** dan atur interval (15–30 detik sudah cukup).
+5. Buka tab **Position**, centang aplikasi di layar yang diinginkan, atur **Rows**/**Cols**.
+6. Klik cell di preview untuk pin aplikasi ke cell tertentu.
+7. Klik **Save**. Selesai.
 
-## Example: two VNC sessions on screen 2
+Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tambahkan dua-duanya, centang dua-duanya di layar 2, set **Cols = 2**, nyalakan **AutoFit**. Setiap reconnect, dua-duanya balik otomatis ke posisinya.
 
-Make two shortcuts to the same VNC viewer with different connection arguments. Add both on the **Programs** tab and turn on **Keep Running**. On **Position**, tick both under **Screen 2**, set **Cols = 2**, and enable **AutoFit**. After saving, each session gets relaunched on its own and lands in its own half of the screen.
+## Unduh
 
-## Repository layout
+Belum ada rilis. Rilis pertama sedang disiapkan; unduhannya akan muncul di [Releases](https://github.com/asqal90/TileKeeper/releases).
 
-```text
-TileKeeper.sln            solution file
-src/TileKeeper/           the WinForms app: project file, forms, Class/, Properties/, icon
-tests/                    NUnit test project; nunit.framework.dll is vendored
-docs/                     user guide, HTML guide, architecture slides, illustrations
-site/                     GitHub Pages landing page
-.github/workflows/        build, release, and Pages deploy
-```
+## Lisensi
 
-## Where things are
-
-| File | What it does |
-|---|---|
-| `src/TileKeeper/Program.cs` | Startup, single-instance mutex, process protection, config recovery. |
-| `src/TileKeeper/TileKeeperForm.cs` | Tray UI, tabs, settings, timers, watchdog, config persistence. |
-| `src/TileKeeper/TileKeeperForm.Designer.cs` | Control layout generated by the WinForms designer. |
-| `src/TileKeeper/Class/WindowMonitor.cs` | Window matching, layout maths, pin handling, Win32 positioning. |
-| `src/TileKeeper/Class/GridMapPanel.cs` | Preview panel that reuses the runtime layout code. |
-| `src/TileKeeper/Class/Win32ApiImpl.cs` | The actual Win32 calls. |
-| `src/TileKeeper/Class/IWin32Api.cs` | Interface used by tests to stub Win32. |
-| `src/TileKeeper/Class/ProcessCommandLineCache.cs` | Command-line lookup and cache for argument-aware matching. |
-| `src/TileKeeper/Class/DisplayResolutionManager.cs` | Optional resolution hold. |
-| `src/TileKeeper/Class/RemoteDesktopManager.cs` | RDP helper bits. |
-| `src/TileKeeper/Class/ProcessProtector.cs` | Sets up process termination protection. |
-| `tests/` | NUnit tests for layouts, window matching, screen rendering, RDP launch, and command lines. |
-
-## Build
-
-The app targets .NET Framework 4.8, so build it on Windows with Visual Studio or MSBuild:
-
-```text
-msbuild TileKeeper.sln /t:Build /p:Configuration=Release
-```
-
-The test project builds with `tests/TileKeeper.Tests.csproj`. Run it with whatever NUnit runner you have; there is no test runner wired into the repo.
-
-## Documentation
-
-- [User guide](docs/USER_GUIDE.md)
-- [HTML version of the guide](docs/user-guide.html)
-- [Architecture slides](docs/TileKeeper-architecture.pptx)
-
-## License
-
-MIT. See [`LICENSE`](LICENSE). Copyright (c) 2026 Muhammad Nashiruddin Al-Asqalani.
-
-`nunit.framework.dll` is vendored for the test project and keeps its own license, and the .NET Framework runtime is covered by Microsoft's terms. MIT here applies to the source I wrote.
-
-## Notes
-
-- This build has no password prompt. Exit from the tray menu stops the app immediately.
-- Windows only. It relies on WinForms, process APIs, monitor APIs, and native window styles.
-- Don't commit `bin/`, `obj/`, or `.vs/` output.
+MIT, lihat [LICENSE](LICENSE). `nunit.framework.dll` di proyek tes membawa lisensi sendiri.
