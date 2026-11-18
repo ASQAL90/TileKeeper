@@ -24,6 +24,17 @@
   .shots figure { margin: 0; }
   .shots img { width: 100%; border-radius: 10px; border: 1px solid var(--border); display: block; }
   .shots figcaption { margin-top: 6px; color: var(--muted); font-size: .88rem; }
+  table.files { width: 100%; border-collapse: collapse; font-size: .93rem; margin-top: 8px; }
+  table.files th, table.files td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.files th { color: var(--muted); font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; }
+  table.files code { background: rgba(127,127,127,.14); padding: 1px 6px; border-radius: 4px; font-size: .92em; }
+  h3 { font-size: 1.02rem; margin: 28px 0 4px; }
+  p.fine { color: var(--muted); font-size: .9rem; }
+  .mocks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 22px; }
+  @media (max-width: 760px) { .mocks { grid-template-columns: 1fr; } }
+  .mocks figure { margin: 0; }
+  .mocks img { width: 100%; display: block; }
+  .mocks figcaption { margin-top: 4px; color: var(--muted); font-size: .88rem; text-align: center; }
   section { margin-top: 48px; }
   h2 { font-size: 1.3rem; margin: 0 0 12px; }
   ul { padding-left: 1.2rem; color: var(--muted); }
@@ -55,6 +66,40 @@
       <figure><img src="screenshot-system.png" alt="System tab"><figcaption>System — display resolution hold (clamp oversized displays).</figcaption></figure>
       <figure><img src="screenshot-tray-menu.png" alt="Tray menu"><figcaption>Tray menu — Show, About, Exit.</figcaption></figure>
     </div>
+  </section>
+
+  <section>
+    <h2>Adding programs</h2>
+    <p>Drag a file from Explorer and drop it straight onto either list. The other way is the <strong>Add&hellip;</strong> button, which opens a file picker and takes several files at once. <strong>Edit&hellip;</strong> points an existing row at a different file, <strong>Remove</strong> deletes it.</p>
+    <div class="shots">
+      <figure><img src="screenshot-programs-annotated.png" alt="Programs tab with the Add button and the drop area marked"><figcaption>Programs &mdash; the apps to keep running.</figcaption></figure>
+      <figure><img src="screenshot-position-annotated.png" alt="Position tab with the same Add button and drop area marked"><figcaption>Position &mdash; the same buttons and the same drop handling.</figcaption></figure>
+    </div>
+
+    <h3>Files it accepts</h3>
+    <table class="files">
+      <thead><tr><th>File</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td><code>.lnk</code></td><td>Any shortcut: on the desktop, in the Start menu, or a saved taskbar shortcut. ClickOnce shortcuts are fine here too.</td></tr>
+        <tr><td><code>.exe</code></td><td>The program itself, for anything that comes as a single executable.</td></tr>
+        <tr><td><code>.rdp</code></td><td>A saved Remote Desktop connection &mdash; the file you normally double-click to open an RDP session.</td></tr>
+        <tr><td><code>.vnc</code></td><td>A saved VNC connection. It opens through whichever VNC viewer Windows has installed (TightVNC, UltraVNC, RealVNC, and so on).</td></tr>
+        <tr><td><code>.appref-ms</code></td><td>A ClickOnce application &mdash; the &ldquo;Application Reference&rdquo; entry a ClickOnce app puts in the Start menu.</td></tr>
+      </tbody>
+    </table>
+    <p class="fine">Dropping the same file twice does nothing; duplicates are ignored. Two shortcuts to the same program with different arguments stay separate rows, so two VNC hosts or two SCADA views each get their own position. TileKeeper refuses to add itself.</p>
+  </section>
+
+  <section>
+    <h2>Example layouts</h2>
+    <p>What a monitoring wall looks like with different numbers of apps: a production counter, SCADA, quality charts, server and network monitors, CCTV, alarm lists. Any mix works.</p>
+    <div class="mocks">
+      <figure><img src="mock-2-apps.png" alt="Mockup: two apps side by side"><figcaption>Two apps, side by side.</figcaption></figure>
+      <figure><img src="mock-4-apps.png" alt="Mockup: four apps in a 2 by 2 grid"><figcaption>Four apps, 2&times;2.</figcaption></figure>
+      <figure><img src="mock-6-apps.png" alt="Mockup: six apps in a 3 by 2 grid"><figcaption>Six apps, 3&times;2.</figcaption></figure>
+      <figure><img src="mock-9-apps.png" alt="Mockup: nine apps in a 3 by 3 grid"><figcaption>Nine apps, 3&times;3 &mdash; the maximum per screen.</figcaption></figure>
+    </div>
+    <p class="fine">Illustrations, not screenshots of real plants.</p>
   </section>
 
   <section>
