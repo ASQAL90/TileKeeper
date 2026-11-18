@@ -54,6 +54,33 @@ Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tamb
 | ![System tab](site/screenshot-system.png) | ![Tray menu](site/screenshot-tray-menu.png) |
 | System — display resolution hold | Tray menu — Show, About, Exit |
 
+## Menambah program
+
+Ada dua cara: seret file dari Explorer langsung ke daftar (tab **Programs** atau **Position**), atau klik **Add…** lalu pilih filenya — bisa beberapa sekaligus. **Edit…** mengganti file pada baris yang sudah ada, **Remove** menghapusnya.
+
+![Tombol Add dan area drop](site/screenshot-programs-annotated.png)
+
+| Berkas | Keterangan |
+|---|---|
+| `.lnk` | Shortcut apa pun: desktop, Start menu, atau shortcut ClickOnce |
+| `.exe` | Programnya langsung |
+| `.rdp` | Koneksi Remote Desktop tersimpan, file yang biasa diklik dua kali |
+| `.vnc` | Koneksi VNC tersimpan; dibuka lewat viewer yang terpasang (TightVNC, UltraVNC, RealVNC, dan sejenisnya) |
+| `.appref-ms` | Aplikasi ClickOnce dari Start menu |
+
+File yang sama tidak ditambahkan dua kali. Dua shortcut ke program yang sama dengan argumen berbeda tetap jadi dua baris, jadi dua host VNC atau dua tampilan SCADA punya posisi sendiri-sendiri. TileKeeper tidak bisa menambahkan dirinya sendiri.
+
+## Contoh tata letak
+
+Ilustrasi satu layar monitor dengan jumlah aplikasi berbeda: production counter, SCADA, quality, server dan network monitoring, CCTV, dan daftar alarm. Bukan tangkapan layar pabrik sungguhan.
+
+|  |  |
+|---|---|
+| ![2 aplikasi](site/mock-2-apps.png) | ![4 aplikasi](site/mock-4-apps.png) |
+| Dua aplikasi berdampingan | Empat aplikasi, 2×2 |
+| ![6 aplikasi](site/mock-6-apps.png) | ![9 aplikasi](site/mock-9-apps.png) |
+| Enam aplikasi, 3×2 | Sembilan aplikasi, 3×3 (maksimal per layar) |
+
 ## Unduh
 
 ### v1.0.0 (terbaru)
