@@ -72,7 +72,9 @@ File yang sama tidak ditambahkan dua kali. Dua shortcut ke program yang sama den
 
 ## Contoh tata letak
 
-Ilustrasi satu layar monitor dengan jumlah aplikasi berbeda: production counter, SCADA, quality, server dan network monitoring, CCTV, dan daftar alarm. Bukan tangkapan layar pabrik sungguhan.
+Ilustrasi satu layar monitor dengan jumlah aplikasi berbeda: production counter, SCADA, quality, server dan network monitoring, CCTV, dan daftar alarm.
+
+Semua gambar di bagian ini adalah **mock desain, bukan tangkapan layar asli dan bukan hasil produksi nyata**. Angka, nama line, alarm, dan tata letaknya dibuat-buat untuk ilustrasi. Kalau ada kemiripan dengan pabrik, line, atau sistem tertentu, itu kebetulan. Tangkapan layar penggunaan asli tidak bisa dipublikasikan karena menyangkut sensitivitas dan kerahasiaan data perusahaan.
 
 |  |  |
 |---|---|

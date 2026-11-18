@@ -35,6 +35,9 @@
   .mocks figure { margin: 0; }
   .mocks img { width: 100%; display: block; }
   .mocks figcaption { margin-top: 4px; color: var(--muted); font-size: .88rem; text-align: center; }
+  .notice { margin: 0 0 18px; padding: 12px 16px; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; background: var(--card); color: var(--muted); font-size: .9rem; }
+  .notice strong { color: var(--fg); }
+  .tag { display: inline-block; vertical-align: middle; margin-left: 8px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); font-size: .62em; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
   section { margin-top: 48px; }
   h2 { font-size: 1.3rem; margin: 0 0 12px; }
   ul { padding-left: 1.2rem; color: var(--muted); }
@@ -91,15 +94,17 @@
   </section>
 
   <section>
-    <h2>Example layouts</h2>
+    <h2>Example layouts<span class="tag">mock-up</span></h2>
     <p>What a monitoring wall looks like with different numbers of apps: a production counter, SCADA, quality charts, server and network monitors, CCTV, alarm lists. Any mix works.</p>
+    <div class="notice">
+      <strong>These are design mock-ups, not real screens.</strong> Every number, line name, alarm, and tile layout here is invented for illustration; none of it is real production output. Any resemblance to an actual plant, line, or system is coincidental. Screenshots from real use cannot be published because they contain sensitive and confidential company data.
+    </div>
     <div class="mocks">
       <figure><img src="mock-2-apps.png" alt="Mockup: two apps side by side"><figcaption>Two apps, side by side.</figcaption></figure>
       <figure><img src="mock-4-apps.png" alt="Mockup: four apps in a 2 by 2 grid"><figcaption>Four apps, 2&times;2.</figcaption></figure>
       <figure><img src="mock-6-apps.png" alt="Mockup: six apps in a 3 by 2 grid"><figcaption>Six apps, 3&times;2.</figcaption></figure>
       <figure><img src="mock-9-apps.png" alt="Mockup: nine apps in a 3 by 3 grid"><figcaption>Nine apps, 3&times;3 &mdash; the maximum per screen.</figcaption></figure>
     </div>
-    <p class="fine">Illustrations, not screenshots of real plants.</p>
   </section>
 
   <section>
