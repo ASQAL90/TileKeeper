@@ -50,7 +50,7 @@
 <body>
 <main class="wrap">
   <header>
-    <h1>TileKeeper</h1>
+    <h1>TileKeeper<span class="tag">v1.1.0</span></h1>
     <p class="tagline">A Windows tray utility that keeps selected programs running and restores their windows to the monitors and grid cells you chose.</p>
     <div class="buttons">
       <a class="btn primary" href="https://github.com/asqal90/TileKeeper/releases/latest/download/TileKeeper-win.zip">Download for Windows</a>
@@ -59,14 +59,24 @@
     <p class="meta">Windows 10/11 · .NET Framework 4.8 · portable ZIP</p>
   </header>
 
+  <section>
+    <h2>What's new in v1.1.0<span class="tag">latest</span></h2>
+    <ul>
+      <li>English UI: <strong>Keep Apps Running</strong>, <strong>Arrange Windows</strong>, <strong>Display &amp; Settings</strong>.</li>
+      <li>Per-app <strong>Enable</strong> checkboxes, independent for relaunching and window arranging.</li>
+      <li>A read-only update check that opens the GitHub release page; TileKeeper never replaces its own executable.</li>
+      <li>Configurable <strong>Process Protection</strong> (<code>EnableTerminateProtection</code>, default on).</li>
+    </ul>
+  </section>
+
   <img class="shot" src="screenshot-tray.png" alt="TileKeeper tray menu screenshot">
 
   <section>
     <h2>Screenshots</h2>
     <div class="shots">
-      <figure><img src="screenshot-programs.png" alt="Programs tab"><figcaption>Programs — the keep-alive list; Add, Edit, Remove; 15s cycle.</figcaption></figure>
-      <figure><img src="screenshot-position.png" alt="Position tab"><figcaption>Position — assign programs to screens and 3&times;3 cells, AutoFit, Borderless.</figcaption></figure>
-      <figure><img src="screenshot-system.png" alt="System tab"><figcaption>System — display resolution hold (clamp oversized displays).</figcaption></figure>
+      <figure><img src="screenshot-programs.png" alt="Keep Apps Running tab"><figcaption>Keep Apps Running — the keep-alive list; per-app Enable, Add, Edit, Remove; 15s cycle.</figcaption></figure>
+      <figure><img src="screenshot-position.png" alt="Arrange Windows tab"><figcaption>Arrange Windows — assign programs to screens and 3&times;3 cells, per-app Enable, AutoFit, Borderless.</figcaption></figure>
+      <figure><img src="screenshot-system.png" alt="Display & Settings tab"><figcaption>Display &amp; Settings — display resolution hold, update check, and Process Protection.</figcaption></figure>
       <figure><img src="screenshot-tray-menu.png" alt="Tray menu"><figcaption>Tray menu — Show, About, Exit.</figcaption></figure>
     </div>
   </section>
@@ -75,8 +85,8 @@
     <h2>Adding programs</h2>
     <p>Drag a file from Explorer and drop it straight onto either list. The other way is the <strong>Add&hellip;</strong> button, which opens a file picker and takes several files at once. <strong>Edit&hellip;</strong> points an existing row at a different file, <strong>Remove</strong> deletes it.</p>
     <div class="shots">
-      <figure><img src="screenshot-programs-annotated.png" alt="Programs tab with the Add button and the drop area marked"><figcaption>Programs &mdash; the apps to keep running.</figcaption></figure>
-      <figure><img src="screenshot-position-annotated.png" alt="Position tab with the same Add button and drop area marked"><figcaption>Position &mdash; the same buttons and the same drop handling.</figcaption></figure>
+      <figure><img src="screenshot-programs-annotated.png" alt="Keep Apps Running tab with the Add button and the drop area marked"><figcaption>Keep Apps Running &mdash; the apps to keep running.</figcaption></figure>
+      <figure><img src="screenshot-position-annotated.png" alt="Arrange Windows tab with the same Add button and drop area marked"><figcaption>Arrange Windows &mdash; the same buttons and the same drop handling.</figcaption></figure>
     </div>
 
     <h3>Files it accepts</h3>
@@ -113,7 +123,10 @@
       <li>Relaunches configured programs when they exit.</li>
       <li>Moves matching windows to the assigned monitor and 3×3 grid cell.</li>
       <li>Pins apps to fixed cells or fills the remaining space automatically.</li>
+      <li>Per-app Enable switches, independent for relaunching and window arranging.</li>
       <li>Optional borderless mode and display-resolution hold.</li>
+      <li>A read-only update check that opens the GitHub release page.</li>
+      <li>Optional Process Protection against Task Manager End Task for standard users (restart required to apply).</li>
     </ul>
   </section>
 
