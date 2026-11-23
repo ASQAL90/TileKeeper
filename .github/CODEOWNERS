@@ -1,0 +1,7 @@
+# Pemilik kode default. Tinjauan pemilik diperlukan untuk semua perubahan.
+* @ASQAL90
+
+# Perubahan pada rilis dan keamanan memerlukan tinjauan eksplisit.
+/.github/ @ASQAL90
+/SECURITY.md @ASQAL90
+/PRIVACY.md @ASQAL90
