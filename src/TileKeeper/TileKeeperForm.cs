@@ -2605,7 +2605,11 @@ namespace TileKeeper
         // Miscellaneous UI handlers
         // ─────────────────────────────────────────────────────────────────────
 
-        /// <summary>Clears the program/position form fields back to their defaults.</summary>
+        /// <summary>
+        /// Resets the editable program lists, screen assignments, and layout options to their
+        /// defaults in the current form. It does not delete the saved configuration until Save
+        /// is clicked, and it leaves cycle intervals, display hold, and update settings alone.
+        /// </summary>
         private void BtnClear_Click(object sender, EventArgs e)
         {
             listPrograms.Items.Clear();

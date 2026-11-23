@@ -23,8 +23,10 @@ with the X button minimizes it back to the tray — it does not stop the program
 | **Arrange Windows** | Which screen and grid cell each program's window belongs on. |
 | **Display & Settings** | Display resolution hold, optional registry settings, and update check. |
 
-`Save` at the bottom writes everything and closes to the tray. `Clear` wipes all lists/settings —
-not for everyday use.
+`Save` at the bottom writes everything and closes to the tray. `Reset Programs & Layout` empties
+the program lists, screen assignments, and layout options in the current form; it does not delete
+the saved configuration until you click `Save`. It leaves cycle intervals, display hold, and
+update settings unchanged. Avoid it for everyday use.
 
 ## Keep Apps Running tab
 

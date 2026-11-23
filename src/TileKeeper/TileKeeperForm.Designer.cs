@@ -994,9 +994,9 @@ namespace TileKeeper
             this.btnClear.Location = new System.Drawing.Point(95, 620);
             this.btnClear.Margin = new System.Windows.Forms.Padding(2);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(75, 26);
+            this.btnClear.Size = new System.Drawing.Size(160, 26);
             this.btnClear.TabIndex = 13;
-            this.btnClear.Text = "Clear";
+            this.btnClear.Text = "Reset Programs & Layout";
             this.btnClear.UseVisualStyleBackColor = false;
             this.btnClear.Click += new System.EventHandler(this.BtnClear_Click);
             // 
