@@ -395,7 +395,7 @@ namespace TileKeeper
             this.checkedScreen1.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen1.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen1.Name = "checkedScreen1";
-            this.checkedScreen1.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen1.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen1.TabIndex = 4;
             // 
             // lblGridRows1
@@ -501,7 +501,7 @@ namespace TileKeeper
             this.checkedScreen2.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen2.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen2.Name = "checkedScreen2";
-            this.checkedScreen2.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen2.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen2.TabIndex = 4;
             // 
             // lblGridRows2
@@ -607,7 +607,7 @@ namespace TileKeeper
             this.checkedScreen3.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen3.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen3.Name = "checkedScreen3";
-            this.checkedScreen3.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen3.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen3.TabIndex = 4;
             // 
             // lblGridRows3
@@ -713,7 +713,7 @@ namespace TileKeeper
             this.checkedScreen4.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen4.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen4.Name = "checkedScreen4";
-            this.checkedScreen4.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen4.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen4.TabIndex = 4;
             // 
             // lblGridRows4
@@ -808,7 +808,7 @@ namespace TileKeeper
             //
             // btnAbout
             //
-            this.btnAbout.Location = new System.Drawing.Point(9, 258);
+            this.btnAbout.Location = new System.Drawing.Point(9, 261);
             this.btnAbout.Margin = new System.Windows.Forms.Padding(2);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(93, 27);
@@ -877,7 +877,7 @@ namespace TileKeeper
             this.lblResCycle.Name = "lblResCycle";
             this.lblResCycle.Size = new System.Drawing.Size(70, 13);
             this.lblResCycle.TabIndex = 5;
-            this.lblResCycle.Text = "Check (sec) :";
+            this.lblResCycle.Text = "Check (sec):";
             // 
             // txtResHeight
             // 
@@ -897,7 +897,7 @@ namespace TileKeeper
             this.lblResHeight.Name = "lblResHeight";
             this.lblResHeight.Size = new System.Drawing.Size(44, 13);
             this.lblResHeight.TabIndex = 3;
-            this.lblResHeight.Text = "Height :";
+            this.lblResHeight.Text = "Height:";
             // 
             // txtResWidth
             // 
@@ -917,7 +917,7 @@ namespace TileKeeper
             this.lblResWidth.Name = "lblResWidth";
             this.lblResWidth.Size = new System.Drawing.Size(41, 13);
             this.lblResWidth.TabIndex = 1;
-            this.lblResWidth.Text = "Width :";
+            this.lblResWidth.Text = "Width:";
             // 
             // chkEnableRes
             // 
@@ -936,7 +936,7 @@ namespace TileKeeper
             this.grpRegistry.Controls.Add(this.lblClickOnceZoneStatus);
             this.grpRegistry.Controls.Add(this.lblClickOnceZoneInfo);
             this.grpRegistry.Controls.Add(this.chkEnableClickOnceZone);
-            this.grpRegistry.Location = new System.Drawing.Point(9, 97);
+            this.grpRegistry.Location = new System.Drawing.Point(9, 99);
             this.grpRegistry.Margin = new System.Windows.Forms.Padding(2);
             this.grpRegistry.Name = "grpRegistry";
             this.grpRegistry.Padding = new System.Windows.Forms.Padding(2);
@@ -962,13 +962,13 @@ namespace TileKeeper
             this.lblClickOnceZoneInfo.Location = new System.Drawing.Point(9, 39);
             this.lblClickOnceZoneInfo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblClickOnceZoneInfo.Name = "lblClickOnceZoneInfo";
-            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 78);
+            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 64);
             this.lblClickOnceZoneInfo.TabIndex = 1;
-            this.lblClickOnceZoneInfo.Text = "What it does: lets ClickOnce apps update without SmartScreen warnings.\r\nRisk: Windows will trust that server more.\r\nOnly private/intranet hosts are accepted; public hosts are rejected.\r\nOff by default. Enable it only for servers you own.";
+            this.lblClickOnceZoneInfo.Text = "What it does: lets ClickOnce apps update without SmartScreen warnings.\r\nRisk: Windows will trust that server more.\r\nScope: private/intranet hosts only; public hosts are rejected.\r\nDefault: off. Enable it only for servers you own.";
             // 
             // btnCleanupClickOnceZone
             // 
-            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 122);
+            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 111);
             this.btnCleanupClickOnceZone.Margin = new System.Windows.Forms.Padding(2);
             this.btnCleanupClickOnceZone.Name = "btnCleanupClickOnceZone";
             this.btnCleanupClickOnceZone.Size = new System.Drawing.Size(148, 23);
@@ -979,7 +979,7 @@ namespace TileKeeper
             // 
             // lblClickOnceZoneStatus
             // 
-            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 126);
+            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 114);
             this.lblClickOnceZoneStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblClickOnceZoneStatus.Name = "lblClickOnceZoneStatus";
             this.lblClickOnceZoneStatus.Size = new System.Drawing.Size(281, 18);

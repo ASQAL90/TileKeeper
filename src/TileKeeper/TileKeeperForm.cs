@@ -254,7 +254,7 @@ namespace TileKeeper
             grpUpdate = new GroupBox
             {
                 Text = "Application Update",
-                Location = new Point(9, 292),
+                Location = new Point(9, 296),
                 Size = new Size(453, 112),
                 TabIndex = 6,
                 TabStop = false
@@ -278,7 +278,7 @@ namespace TileKeeper
 
             btnOpenRelease = new Button
             {
-                Location = new Point(147, 45),
+                Location = new Point(149, 45),
                 Size = new Size(132, 25),
                 Text = "Open release page",
                 UseVisualStyleBackColor = true
