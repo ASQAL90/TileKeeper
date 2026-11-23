@@ -44,7 +44,7 @@ Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun
 4. Nyalakan **Keep Running** dan atur interval (15–30 detik sudah cukup).
 5. Buka tab **Arrange Windows**, centang aplikasi di layar yang diinginkan, atur **Rows**/**Cols**.
 6. Klik cell di preview untuk pin aplikasi ke cell tertentu.
-7. Klik **Save**. Selesai.
+7. Klik **Save & Close**. Selesai.
 
 Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tambahkan dua-duanya, centang dua-duanya di layar 2, set **Cols = 2**, nyalakan **AutoFit**. Setiap reconnect, dua-duanya balik otomatis ke posisinya.
 
@@ -88,12 +88,23 @@ Semua gambar di bagian ini adalah **mock desain, bukan tangkapan layar asli dan 
 
 ## Unduh
 
-### v1.0.0 (terbaru)
+### v1.1.0 (terbaru)
 
 | Berkas | Keterangan |
 |---|---|
-| [TileKeeper-win.zip](https://github.com/ASQAL90/TileKeeper/releases/download/v1.0.0/TileKeeper-win.zip) | `TileKeeper.exe` + `TileKeeper.exe.config`, tanpa installer |
-| [SHA256SUMS.txt](https://github.com/ASQAL90/TileKeeper/releases/download/v1.0.0/SHA256SUMS.txt) | Checksum SHA-256 |
+| [TileKeeper-win.zip](https://github.com/ASQAL90/TileKeeper/releases/latest/download/TileKeeper-win.zip) | `TileKeeper.exe` + `TileKeeper.exe.config`, tanpa installer |
+| [SHA256SUMS.txt](https://github.com/ASQAL90/TileKeeper/releases/latest/download/SHA256SUMS.txt) | Checksum SHA-256 |
+
+Perubahan utama v1.1.0:
+
+- Checkbox **Enable** terpisah untuk **Keep Apps Running** dan **Arrange Windows**.
+- Tombol **Check for updates** dan **Open release page** di tab **Display & Settings**.
+- UI bahasa Inggris: **Keep Apps Running**, **Arrange Windows**, **Display & Settings**, **Save & Close**, **Reset Programs & Layout**.
+- Opsi **Process Protection** (`EnableTerminateProtection`, default aktif) yang bisa dimatikan lalu restart.
+
+### v1.0.0
+
+Rilis sebelumnya: [v1.0.0](https://github.com/ASQAL90/TileKeeper/releases/tag/v1.0.0).
 
 Butuh .NET Framework 4.8. Unsigned — SmartScreen mungkin memberi peringatan pertama kali jalan.
 
