@@ -1,0 +1,52 @@
+name: Laporan Bug
+description: Laporkan bug yang dapat direproduksi (bukan masalah keamanan).
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Jangan gunakan formulir ini untuk masalah keamanan. Ikuti `SECURITY.md`.
+        Jangan menyertakan token, kunci, atau data pribadi.
+  - type: input
+    id: version
+    attributes:
+      label: Versi TileKeeper
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Versi Windows dan arsitektur
+      placeholder: "Windows 11 24H2 x64"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Langkah reproduksi
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Perilaku yang diharapkan
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log (opsional)
+      description: >
+        Log ada di %APPDATA%\TileKeeper\error.log. Hapus path pengguna dan nama
+        host sebelum menempel.
+      render: text
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Konfirmasi
+      options:
+        - label: Saya sudah mencari issue yang serupa.
+          required: true
+        - label: Laporan ini bukan masalah keamanan.
+          required: true
