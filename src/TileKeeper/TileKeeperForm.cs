@@ -372,6 +372,11 @@ namespace TileKeeper
             txtResHeight.Text = GetConfigValue("ResolutionHeight", "1080");
             txtResCycle.Text  = GetConfigValue("ResolutionCheckSeconds", "10");
 
+            // Registry / Intranet Zone opt-in (default off). Nothing is written unless
+            // the user explicitly enables this in the System tab.
+            chkEnableClickOnceZone.Checked = IsClickOnceZoneEnabled();
+            UpdateClickOnceZoneStatus();
+
             // Convert the config values (seconds) to milliseconds for Thread.Sleep
             monitorTimer       = int.Parse(txtCycle.Text)       * 1000;
             keepScreenPosTimer = int.Parse(txtCycleScreen.Text) * 1000;
@@ -387,7 +392,7 @@ namespace TileKeeper
         private void Form1_Load(object sender, EventArgs e)
         {
             InitializeOrReload();
-            ApplyIntranetZoneForClickOnceServers(); // Suppress SmartScreen on startup
+            ApplyIntranetZoneForClickOnceServers(); // No-op unless the user opted in
 
             // async Task entry — an `async void` here would die at the first await under a
             // plain Thread and crash the process on any uncaught exception.
@@ -1624,6 +1629,7 @@ namespace TileKeeper
                 "CycleKeepScreen", "EnableCustomPosition",
                 "CpuUsage", "MemUsage", "EnableMonitoring",
                 "EnableResolutionHold", "ResolutionWidth", "ResolutionHeight", "ResolutionCheckSeconds",
+                "EnableClickOnceIntranetZone", "IntranetZoneManagedHosts",
                 "ClientSettingsProvider.ServiceUri",
                 // Screen3/Screen4 are always saved now (BtnSave_Click no longer gates them on
                 // monitor detection), so their keys must always exist too, regardless of how
@@ -1654,16 +1660,112 @@ namespace TileKeeper
         /// <summary>
         /// Registers each configured ClickOnce host in the Windows Local Intranet Zone
         /// (HKCU) so that SmartScreen does not prompt when ClickOnce auto-updates launch.
+        /// Does nothing unless the user enabled <c>EnableClickOnceIntranetZone</c>.
         /// </summary>
         private void ApplyIntranetZoneForClickOnceServers()
         {
+            if (!IsClickOnceZoneEnabled())
+                return;
+
             string programPaths = GetConfigValue("ProgramPath", "");
-            foreach (string path in programPaths.Split(','))
+            var managed = new HashSet<string>(
+                SplitConfigList(GetConfigValue(RemoteDesktopManager.ManagedHostsSettingKey, "")),
+                StringComparer.OrdinalIgnoreCase);
+
+            bool changed = false;
+            foreach (string path in SplitProgramPaths(programPaths))
             {
-                string host = RemoteDesktopManager.ExtractClickOnceHost(path.Trim());
-                if (!string.IsNullOrEmpty(host))
-                    RemoteDesktopManager.AddToIntranetZone(host);
+                string host = RemoteDesktopManager.ExtractClickOnceHost(path);
+                if (string.IsNullOrEmpty(host))
+                    continue;
+
+                if (RemoteDesktopManager.AddToIntranetZone(host) && managed.Add(host))
+                    changed = true;
             }
+
+            if (changed)
+                SaveSettings(RemoteDesktopManager.ManagedHostsSettingKey, string.Join(",", managed));
+
+            UpdateClickOnceZoneStatus();
+        }
+
+        /// <summary>True when the user enabled the opt-in Intranet Zone exemption.</summary>
+        private bool IsClickOnceZoneEnabled()
+        {
+            return string.Equals(
+                GetConfigValue(RemoteDesktopManager.EnableSettingKey, "False"),
+                bool.TrueString,
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Removes the Intranet Zone entries this application may have created. Covers
+        /// both the tracked host list and the currently configured ClickOnce hosts so a
+        /// host removed from the program list can still be cleaned up. Public/user
+        /// entries are refused by <see cref="RemoteDesktopManager.RemoveFromIntranetZone(string)"/>.
+        /// </summary>
+        private int RemoveManagedIntranetZoneEntries()
+        {
+            var hosts = new HashSet<string>(
+                SplitConfigList(GetConfigValue(RemoteDesktopManager.ManagedHostsSettingKey, "")),
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (string path in SplitProgramPaths(GetConfigValue("ProgramPath", "")))
+            {
+                string host = RemoteDesktopManager.ExtractClickOnceHost(path);
+                if (!string.IsNullOrEmpty(host))
+                    hosts.Add(host);
+            }
+
+            int removed = RemoteDesktopManager.RemoveFromIntranetZone(hosts);
+            SaveSettings(RemoteDesktopManager.ManagedHostsSettingKey, "");
+            return removed;
+        }
+
+        /// <summary>Writes the one-line status under the registry checkbox.</summary>
+        private void UpdateClickOnceZoneStatus()
+        {
+            if (chkEnableClickOnceZone.Checked)
+            {
+                lblClickOnceZoneStatus.Text = "Aktif — host privat saja";
+                lblClickOnceZoneStatus.ForeColor = Color.FromArgb(0, 120, 70);
+            }
+            else
+            {
+                lblClickOnceZoneStatus.Text = "Nonaktif (default) — tidak menulis registry";
+                lblClickOnceZoneStatus.ForeColor = Color.FromArgb(90, 90, 90);
+            }
+        }
+
+        private void ChkEnableClickOnceZone_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateClickOnceZoneStatus();
+        }
+
+        private void BtnCleanupClickOnceZone_Click(object sender, EventArgs e)
+        {
+            DialogResult answer = MessageBox.Show(
+                this,
+                "Hapus entri Intranet Zone yang dibuat TileKeeper untuk server ClickOnce yang terdaftar?\r\n\r\n" +
+                "Hanya entri host privat/intranet milik konfigurasi ini yang dihapus; entri lain tidak disentuh.",
+                "Bersihkan entri registry",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
+
+            if (answer != DialogResult.Yes)
+                return;
+
+            int removed = RemoveManagedIntranetZoneEntries();
+            UpdateClickOnceZoneStatus();
+            MessageBox.Show(
+                this,
+                removed > 0
+                    ? $"{removed} entri Intranet Zone dihapus."
+                    : "Tidak ada entri Intranet Zone yang perlu dihapus.",
+                "Bersihkan entri registry",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -1755,8 +1857,28 @@ namespace TileKeeper
             monitorTimer       = int.Parse(txtCycle.Text)       * 1000;
             keepScreenPosTimer = int.Parse(txtCycleScreen.Text) * 1000;
 
+            // Registry / Intranet Zone (opt-in). Disabling removes only the entries
+            // TileKeeper added, so the checkbox is a real on/off switch.
+            SaveSettings(RemoteDesktopManager.EnableSettingKey, chkEnableClickOnceZone.Checked.ToString());
             BackupConfig();
-            ApplyIntranetZoneForClickOnceServers();
+            if (chkEnableClickOnceZone.Checked)
+            {
+                ApplyIntranetZoneForClickOnceServers();
+            }
+            else
+            {
+                int removed = RemoveManagedIntranetZoneEntries();
+                UpdateClickOnceZoneStatus();
+                if (removed > 0)
+                {
+                    MessageBox.Show(
+                        $"{removed} entri Intranet Zone yang dibuat TileKeeper telah dihapus karena opsi dimatikan.",
+                        "Registry dibersihkan",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+            }
+
             MessageBox.Show("Settings saved successfully!", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close(); // Triggers OnFormClosing → minimises to tray
         }
