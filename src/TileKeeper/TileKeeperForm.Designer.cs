@@ -101,6 +101,9 @@ namespace TileKeeper
             this.lblClickOnceZoneInfo = new System.Windows.Forms.Label();
             this.lblClickOnceZoneStatus = new System.Windows.Forms.Label();
             this.btnCleanupClickOnceZone = new System.Windows.Forms.Button();
+            this.grpProcessProtection = new System.Windows.Forms.GroupBox();
+            this.chkEnableTerminateProtection = new System.Windows.Forms.CheckBox();
+            this.lblProcessProtectionInfo = new System.Windows.Forms.Label();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.tabMain.SuspendLayout();
@@ -796,6 +799,7 @@ namespace TileKeeper
             // 
             this.tabSystem.Controls.Add(this.btnAbout);
             this.tabSystem.Controls.Add(this.grpRegistry);
+            this.tabSystem.Controls.Add(this.grpProcessProtection);
             this.tabSystem.Controls.Add(this.grpResolution);
             this.tabSystem.Location = new System.Drawing.Point(4, 22);
             this.tabSystem.Margin = new System.Windows.Forms.Padding(2);
@@ -808,7 +812,7 @@ namespace TileKeeper
             //
             // btnAbout
             //
-            this.btnAbout.Location = new System.Drawing.Point(9, 261);
+            this.btnAbout.Location = new System.Drawing.Point(9, 339);
             this.btnAbout.Margin = new System.Windows.Forms.Padding(2);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(93, 27);
@@ -986,6 +990,39 @@ namespace TileKeeper
             this.lblClickOnceZoneStatus.TabIndex = 3;
             this.lblClickOnceZoneStatus.Text = "Off (default) - registry is not changed";
             // 
+            // grpProcessProtection
+            // 
+            this.grpProcessProtection.Controls.Add(this.chkEnableTerminateProtection);
+            this.grpProcessProtection.Controls.Add(this.lblProcessProtectionInfo);
+            this.grpProcessProtection.Location = new System.Drawing.Point(9, 261);
+            this.grpProcessProtection.Margin = new System.Windows.Forms.Padding(2);
+            this.grpProcessProtection.Name = "grpProcessProtection";
+            this.grpProcessProtection.Padding = new System.Windows.Forms.Padding(2);
+            this.grpProcessProtection.Size = new System.Drawing.Size(453, 70);
+            this.grpProcessProtection.TabIndex = 6;
+            this.grpProcessProtection.TabStop = false;
+            this.grpProcessProtection.Text = "Process Protection";
+            // 
+            // chkEnableTerminateProtection
+            // 
+            this.chkEnableTerminateProtection.AutoSize = true;
+            this.chkEnableTerminateProtection.Location = new System.Drawing.Point(9, 18);
+            this.chkEnableTerminateProtection.Margin = new System.Windows.Forms.Padding(2);
+            this.chkEnableTerminateProtection.Name = "chkEnableTerminateProtection";
+            this.chkEnableTerminateProtection.Size = new System.Drawing.Size(307, 17);
+            this.chkEnableTerminateProtection.TabIndex = 0;
+            this.chkEnableTerminateProtection.Text = "Block Task Manager End Task for standard users";
+            this.chkEnableTerminateProtection.UseVisualStyleBackColor = true;
+            // 
+            // lblProcessProtectionInfo
+            // 
+            this.lblProcessProtectionInfo.Location = new System.Drawing.Point(9, 39);
+            this.lblProcessProtectionInfo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblProcessProtectionInfo.Name = "lblProcessProtectionInfo";
+            this.lblProcessProtectionInfo.Size = new System.Drawing.Size(435, 28);
+            this.lblProcessProtectionInfo.TabIndex = 1;
+            this.lblProcessProtectionInfo.Text = "Prevents accidental termination in kiosk setups. Exit from the tray menu still works.\r\nRestart TileKeeper to apply changes.";
+            // 
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -1097,6 +1134,9 @@ private TileKeeper.ColoredCheckedListBox checkedScreen1;
         private System.Windows.Forms.Label lblClickOnceZoneInfo;
         private System.Windows.Forms.Label lblClickOnceZoneStatus;
         private System.Windows.Forms.Button btnCleanupClickOnceZone;
+        private System.Windows.Forms.GroupBox grpProcessProtection;
+        private System.Windows.Forms.CheckBox chkEnableTerminateProtection;
+        private System.Windows.Forms.Label lblProcessProtectionInfo;
         private System.Windows.Forms.Label lblResWidth;
         private System.Windows.Forms.TextBox txtResWidth;
         private System.Windows.Forms.Label lblResHeight;

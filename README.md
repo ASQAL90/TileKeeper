@@ -32,6 +32,7 @@ Dia juga ingat di monitor dan kolom mana setiap jendela harus ditempatkan. Maksi
 - **Largest window**: kalau satu aplikasi punya banyak jendela, pilih yang terbesar.
 - **Enabled per aplikasi**: checkbox di tiap daftar bisa dimatikan sementara tanpa menghapus entri. Di tab **Keep Apps Running** itu menghentikan penjagaan agar tidak dijalankan ulang; di tab **Arrange Windows** itu menghentikan penataan jendela. Efeknya terpisah.
 - **Update check**: di tab **Display & Settings**, TileKeeper bisa mengecek rilis terbaru di GitHub lalu membuka halaman unduhannya. Aplikasi tidak mengganti file sendiri otomatis.
+- **Proteksi proses**: secara default Task Manager tidak bisa mengakhiri TileKeeper dari akun user biasa. Bisa dimatikan lewat checkbox **Block Task Manager End Task for standard users** di tab **Display & Settings**, lalu restart. Keluar tetap lewat menu tray **Exit**.
 
 Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun yang jendelanya perlu dijaga tetap di tempatnya — termasuk layar Andon: papan performa, counting produksi, dashboard, dan aplikasi sejenis tampil berdampingan di satu layar, dan selalu kembali ke tempatnya meski layar dimatikan lalu dihidupkan lagi. Kalau mau jalan otomatis dari awal Windows nyala, simpan shortcut TileKeeper ke folder Startup (Win+R → `shell:startup` → tempel shortcut-nya).
 

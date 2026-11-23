@@ -254,9 +254,9 @@ namespace TileKeeper
             grpUpdate = new GroupBox
             {
                 Text = "Application Update",
-                Location = new Point(9, 296),
+                Location = new Point(9, 374),
                 Size = new Size(453, 112),
-                TabIndex = 6,
+                TabIndex = 7,
                 TabStop = false
             };
 
@@ -544,6 +544,12 @@ namespace TileKeeper
             // the user explicitly enables this in the System tab.
             chkEnableClickOnceZone.Checked = IsClickOnceZoneEnabled();
             UpdateClickOnceZoneStatus();
+
+            // Process termination protection (default on). The DACL is applied during
+            // Program.Main, so a change here takes effect after TileKeeper restarts.
+            string protectValue = GetConfigValue("EnableTerminateProtection", "True");
+            chkEnableTerminateProtection.Checked =
+                !bool.TryParse(protectValue, out bool protectProcess) || protectProcess;
 
             // Convert the config values (seconds) to milliseconds for Thread.Sleep
             monitorTimer       = int.Parse(txtCycle.Text)       * 1000;
@@ -1844,7 +1850,7 @@ namespace TileKeeper
                 "CycleKeepScreen", "EnableCustomPosition",
                 "CpuUsage", "MemUsage", "EnableMonitoring",
                 "EnableResolutionHold", "ResolutionWidth", "ResolutionHeight", "ResolutionCheckSeconds",
-                "EnableClickOnceIntranetZone", "IntranetZoneManagedHosts",
+                "EnableClickOnceIntranetZone", "IntranetZoneManagedHosts", "EnableTerminateProtection",
                 "ClientSettingsProvider.ServiceUri",
                 // Screen3/Screen4 are always saved now (BtnSave_Click no longer gates them on
                 // monitor detection), so their keys must always exist too, regardless of how
@@ -2077,6 +2083,7 @@ namespace TileKeeper
             // Registry / Intranet Zone (opt-in). Disabling removes only the entries
             // TileKeeper added, so the checkbox is a real on/off switch.
             SaveSettings(RemoteDesktopManager.EnableSettingKey, chkEnableClickOnceZone.Checked.ToString());
+            SaveSettings("EnableTerminateProtection", chkEnableTerminateProtection.Checked.ToString());
             BackupConfig();
             if (chkEnableClickOnceZone.Checked)
             {

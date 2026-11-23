@@ -1,5 +1,6 @@
 using TileKeeper.Class;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -23,6 +24,7 @@ namespace TileKeeper
     </sectionGroup>
   </configSections>
   <appSettings>
+    <add key=""EnableTerminateProtection"" value=""True""/>
   </appSettings>
   <startup>
     <supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.8""/>
@@ -63,10 +65,15 @@ namespace TileKeeper
             if (RecreateConfigAndRelaunchIfMissing())
                 return;
 
-            // Lock down the process immediately — before any form or thread is created.
-            // Deny PROCESS_TERMINATE for standard users so "End Task" in Task Manager is blocked.
-            // This works without elevation: the process owner always has WRITE_DAC on their own process.
-            ProcessProtector.DenyTerminateForStandardUsers();
+            // Lock down the process immediately — before any form or thread is created, but
+            // only when the user has not opted out in app.config. Deny PROCESS_TERMINATE for
+            // standard users so "End Task" in Task Manager is blocked by default. This works
+            // without elevation: the process owner always has WRITE_DAC on their own process.
+            // A missing, empty, or invalid value keeps the historic protected behaviour.
+            if (IsTerminateProtectionEnabled())
+                ProcessProtector.DenyTerminateForStandardUsers();
+            else
+                Logger.Log("Process protection disabled in config; End Task remains available.");
 
             // "UniqueAppNameMutex" is a system-wide name; createdNew is true only for the first instance
             bool createdNew;
@@ -84,6 +91,17 @@ namespace TileKeeper
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns whether the process should deny End Task for standard users. Missing,
+        /// empty, or unparseable config values keep the built-in protected behaviour so
+        /// upgrading an older install never silently weakens the kiosk guard.
+        /// </summary>
+        private static bool IsTerminateProtectionEnabled()
+        {
+            string value = ConfigurationManager.AppSettings["EnableTerminateProtection"];
+            return !bool.TryParse(value, out bool enabled) || enabled;
         }
 
         /// <summary>

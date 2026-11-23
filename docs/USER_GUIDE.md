@@ -137,6 +137,20 @@ Clamps the display to a fixed resolution on a timer, useful when a display repor
 resolution than a room needs. Settings: enable checkbox, **Width** / **Height**, **Capture
 current** (fills in the display's current resolution for you), **Check (sec)**.
 
+### Process protection
+
+By default TileKeeper denies the `End Task` action in Windows Task Manager to standard users. This
+prevents an accidental stop in a kiosk or shared-PC setup. It is a per-process permission change,
+not a service, registry entry, or startup hook.
+
+- **Block Task Manager End Task for standard users** — uncheck it if support staff must be able to
+  close TileKeeper from Task Manager. The setting is saved with **Save & Close** and takes effect
+  after TileKeeper is restarted.
+- The supported way to exit is still **right-click the tray icon → Exit**. That works with the
+  checkbox either on or off.
+- Administrators can always end the process, and a reboot removes the temporary permission
+  change. This guard is against accidental clicks, not a security boundary.
+
 ### Application update
 
 Shows the currently installed version and two buttons:
@@ -171,6 +185,7 @@ into their half of Screen 2 if dragged out of place.
 | Screen 3/4's Rows/Cols/grid look grayed out | That monitor isn't detected — connect it and those controls re-enable live. The program checklist itself stays usable either way; you can still check/uncheck/reassign programs on a disconnected screen and Save persists it normally. |
 | Save rejected with a grid-size error | More programs checked than the screen's grid has cells — increase Rows/Cols or uncheck one. |
 | Bottom strip of a window's content is cut off in border mode | That app draws at a fixed canvas size and doesn't stretch into the smaller client a title bar leaves behind. Check **Borderless** for that screen, or make the app scale its canvas to the client size. |
+| Task Manager shows Access Denied when ending TileKeeper | Process protection is on (default). Use the tray **Exit** menu, or turn off **Block Task Manager End Task for standard users** on the Display & Settings tab and restart. |
 | Exit asks for a password | You are running the wrong build — the no-password variant exits immediately with no prompt. |
 | Configuration file was deleted or is missing | The app recreates it automatically on next launch — it restarts itself once (you may see the tray icon appear twice in quick succession) so the new file takes effect, then starts normally with default settings. |
 
