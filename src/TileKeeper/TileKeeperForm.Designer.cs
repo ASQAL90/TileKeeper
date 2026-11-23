@@ -101,6 +101,9 @@ namespace TileKeeper
             this.lblClickOnceZoneInfo = new System.Windows.Forms.Label();
             this.lblClickOnceZoneStatus = new System.Windows.Forms.Label();
             this.btnCleanupClickOnceZone = new System.Windows.Forms.Button();
+            this.grpProcessProtection = new System.Windows.Forms.GroupBox();
+            this.chkEnableTerminateProtection = new System.Windows.Forms.CheckBox();
+            this.lblProcessProtectionInfo = new System.Windows.Forms.Label();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.tabMain.SuspendLayout();
@@ -147,7 +150,7 @@ namespace TileKeeper
             this.tabPrograms.Padding = new System.Windows.Forms.Padding(2);
             this.tabPrograms.Size = new System.Drawing.Size(469, 580);
             this.tabPrograms.TabIndex = 0;
-            this.tabPrograms.Text = "Programs";
+            this.tabPrograms.Text = "Keep Apps Running";
             this.tabPrograms.UseVisualStyleBackColor = true;
             // 
             // lblPgmHint
@@ -258,7 +261,7 @@ namespace TileKeeper
             this.tabPosition.Padding = new System.Windows.Forms.Padding(2);
             this.tabPosition.Size = new System.Drawing.Size(469, 580);
             this.tabPosition.TabIndex = 1;
-            this.tabPosition.Text = "Position";
+            this.tabPosition.Text = "Arrange Windows";
             this.tabPosition.UseVisualStyleBackColor = true;
             // 
             // lblPosHint
@@ -395,7 +398,7 @@ namespace TileKeeper
             this.checkedScreen1.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen1.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen1.Name = "checkedScreen1";
-            this.checkedScreen1.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen1.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen1.TabIndex = 4;
             // 
             // lblGridRows1
@@ -441,7 +444,7 @@ namespace TileKeeper
             // chkAutoFit1
             // 
             this.chkAutoFit1.AutoSize = true;
-            this.chkAutoFit1.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit1.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit1.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit1.Name = "chkAutoFit1";
             this.chkAutoFit1.Size = new System.Drawing.Size(59, 17);
@@ -454,7 +457,7 @@ namespace TileKeeper
             this.chkBorderless1.AutoSize = true;
             this.chkBorderless1.Checked = true;
             this.chkBorderless1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless1.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless1.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless1.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless1.Name = "chkBorderless1";
             this.chkBorderless1.Size = new System.Drawing.Size(75, 17);
@@ -501,7 +504,7 @@ namespace TileKeeper
             this.checkedScreen2.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen2.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen2.Name = "checkedScreen2";
-            this.checkedScreen2.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen2.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen2.TabIndex = 4;
             // 
             // lblGridRows2
@@ -547,7 +550,7 @@ namespace TileKeeper
             // chkAutoFit2
             // 
             this.chkAutoFit2.AutoSize = true;
-            this.chkAutoFit2.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit2.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit2.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit2.Name = "chkAutoFit2";
             this.chkAutoFit2.Size = new System.Drawing.Size(59, 17);
@@ -560,7 +563,7 @@ namespace TileKeeper
             this.chkBorderless2.AutoSize = true;
             this.chkBorderless2.Checked = true;
             this.chkBorderless2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless2.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless2.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless2.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless2.Name = "chkBorderless2";
             this.chkBorderless2.Size = new System.Drawing.Size(75, 17);
@@ -607,7 +610,7 @@ namespace TileKeeper
             this.checkedScreen3.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen3.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen3.Name = "checkedScreen3";
-            this.checkedScreen3.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen3.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen3.TabIndex = 4;
             // 
             // lblGridRows3
@@ -653,7 +656,7 @@ namespace TileKeeper
             // chkAutoFit3
             // 
             this.chkAutoFit3.AutoSize = true;
-            this.chkAutoFit3.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit3.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit3.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit3.Name = "chkAutoFit3";
             this.chkAutoFit3.Size = new System.Drawing.Size(59, 17);
@@ -666,7 +669,7 @@ namespace TileKeeper
             this.chkBorderless3.AutoSize = true;
             this.chkBorderless3.Checked = true;
             this.chkBorderless3.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless3.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless3.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless3.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless3.Name = "chkBorderless3";
             this.chkBorderless3.Size = new System.Drawing.Size(75, 17);
@@ -713,7 +716,7 @@ namespace TileKeeper
             this.checkedScreen4.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen4.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen4.Name = "checkedScreen4";
-            this.checkedScreen4.Size = new System.Drawing.Size(120, 109);
+            this.checkedScreen4.Size = new System.Drawing.Size(120, 154);
             this.checkedScreen4.TabIndex = 4;
             // 
             // lblGridRows4
@@ -759,7 +762,7 @@ namespace TileKeeper
             // chkAutoFit4
             // 
             this.chkAutoFit4.AutoSize = true;
-            this.chkAutoFit4.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit4.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit4.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit4.Name = "chkAutoFit4";
             this.chkAutoFit4.Size = new System.Drawing.Size(59, 17);
@@ -772,7 +775,7 @@ namespace TileKeeper
             this.chkBorderless4.AutoSize = true;
             this.chkBorderless4.Checked = true;
             this.chkBorderless4.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless4.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless4.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless4.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless4.Name = "chkBorderless4";
             this.chkBorderless4.Size = new System.Drawing.Size(75, 17);
@@ -796,6 +799,7 @@ namespace TileKeeper
             // 
             this.tabSystem.Controls.Add(this.btnAbout);
             this.tabSystem.Controls.Add(this.grpRegistry);
+            this.tabSystem.Controls.Add(this.grpProcessProtection);
             this.tabSystem.Controls.Add(this.grpResolution);
             this.tabSystem.Location = new System.Drawing.Point(4, 22);
             this.tabSystem.Margin = new System.Windows.Forms.Padding(2);
@@ -803,12 +807,12 @@ namespace TileKeeper
             this.tabSystem.Padding = new System.Windows.Forms.Padding(2);
             this.tabSystem.Size = new System.Drawing.Size(469, 580);
             this.tabSystem.TabIndex = 2;
-            this.tabSystem.Text = "System";
+            this.tabSystem.Text = "Display & Settings";
             this.tabSystem.UseVisualStyleBackColor = true;
             //
             // btnAbout
             //
-            this.btnAbout.Location = new System.Drawing.Point(9, 234);
+            this.btnAbout.Location = new System.Drawing.Point(9, 339);
             this.btnAbout.Margin = new System.Windows.Forms.Padding(2);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(93, 27);
@@ -877,7 +881,7 @@ namespace TileKeeper
             this.lblResCycle.Name = "lblResCycle";
             this.lblResCycle.Size = new System.Drawing.Size(70, 13);
             this.lblResCycle.TabIndex = 5;
-            this.lblResCycle.Text = "Check (sec) :";
+            this.lblResCycle.Text = "Check (sec):";
             // 
             // txtResHeight
             // 
@@ -897,7 +901,7 @@ namespace TileKeeper
             this.lblResHeight.Name = "lblResHeight";
             this.lblResHeight.Size = new System.Drawing.Size(44, 13);
             this.lblResHeight.TabIndex = 3;
-            this.lblResHeight.Text = "Height :";
+            this.lblResHeight.Text = "Height:";
             // 
             // txtResWidth
             // 
@@ -917,7 +921,7 @@ namespace TileKeeper
             this.lblResWidth.Name = "lblResWidth";
             this.lblResWidth.Size = new System.Drawing.Size(41, 13);
             this.lblResWidth.TabIndex = 1;
-            this.lblResWidth.Text = "Width :";
+            this.lblResWidth.Text = "Width:";
             // 
             // chkEnableRes
             // 
@@ -936,14 +940,14 @@ namespace TileKeeper
             this.grpRegistry.Controls.Add(this.lblClickOnceZoneStatus);
             this.grpRegistry.Controls.Add(this.lblClickOnceZoneInfo);
             this.grpRegistry.Controls.Add(this.chkEnableClickOnceZone);
-            this.grpRegistry.Location = new System.Drawing.Point(9, 97);
+            this.grpRegistry.Location = new System.Drawing.Point(9, 99);
             this.grpRegistry.Margin = new System.Windows.Forms.Padding(2);
             this.grpRegistry.Name = "grpRegistry";
             this.grpRegistry.Padding = new System.Windows.Forms.Padding(2);
-            this.grpRegistry.Size = new System.Drawing.Size(453, 130);
+            this.grpRegistry.Size = new System.Drawing.Size(453, 154);
             this.grpRegistry.TabIndex = 5;
             this.grpRegistry.TabStop = false;
-            this.grpRegistry.Text = "Registry — ClickOnce / SmartScreen (opsional)";
+            this.grpRegistry.Text = "Registry - ClickOnce / SmartScreen (optional)";
             // 
             // chkEnableClickOnceZone
             // 
@@ -953,7 +957,7 @@ namespace TileKeeper
             this.chkEnableClickOnceZone.Name = "chkEnableClickOnceZone";
             this.chkEnableClickOnceZone.Size = new System.Drawing.Size(360, 17);
             this.chkEnableClickOnceZone.TabIndex = 0;
-            this.chkEnableClickOnceZone.Text = "Izinkan pengecualian SmartScreen untuk server ClickOnce privat";
+            this.chkEnableClickOnceZone.Text = "Allow SmartScreen exception for private ClickOnce servers";
             this.chkEnableClickOnceZone.UseVisualStyleBackColor = true;
             this.chkEnableClickOnceZone.CheckedChanged += new System.EventHandler(this.ChkEnableClickOnceZone_CheckedChanged);
             // 
@@ -962,41 +966,74 @@ namespace TileKeeper
             this.lblClickOnceZoneInfo.Location = new System.Drawing.Point(9, 39);
             this.lblClickOnceZoneInfo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblClickOnceZoneInfo.Name = "lblClickOnceZoneInfo";
-            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 54);
+            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 64);
             this.lblClickOnceZoneInfo.TabIndex = 1;
-            this.lblClickOnceZoneInfo.Text = "Fungsi: update ClickOnce tanpa peringatan SmartScreen.\r\nRisiko: Windows lebih mempercayai server itu.\r\nHanya host privat/intranet yang diterima; host publik ditolak.\r\nDefault mati. Nyalakan hanya untuk server milik Anda.";
+            this.lblClickOnceZoneInfo.Text = "What it does: lets ClickOnce apps update without SmartScreen warnings.\r\nRisk: Windows will trust that server more.\r\nScope: private/intranet hosts only; public hosts are rejected.\r\nDefault: off. Enable it only for servers you own.";
             // 
             // btnCleanupClickOnceZone
             // 
-            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 98);
+            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 111);
             this.btnCleanupClickOnceZone.Margin = new System.Windows.Forms.Padding(2);
             this.btnCleanupClickOnceZone.Name = "btnCleanupClickOnceZone";
             this.btnCleanupClickOnceZone.Size = new System.Drawing.Size(148, 23);
             this.btnCleanupClickOnceZone.TabIndex = 2;
-            this.btnCleanupClickOnceZone.Text = "Bersihkan entri registry";
+            this.btnCleanupClickOnceZone.Text = "Clear registry entries";
             this.btnCleanupClickOnceZone.UseVisualStyleBackColor = true;
             this.btnCleanupClickOnceZone.Click += new System.EventHandler(this.BtnCleanupClickOnceZone_Click);
             // 
             // lblClickOnceZoneStatus
             // 
-            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 102);
+            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 114);
             this.lblClickOnceZoneStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblClickOnceZoneStatus.Name = "lblClickOnceZoneStatus";
             this.lblClickOnceZoneStatus.Size = new System.Drawing.Size(281, 18);
             this.lblClickOnceZoneStatus.TabIndex = 3;
-            this.lblClickOnceZoneStatus.Text = "Nonaktif (default) — tidak menulis registry";
+            this.lblClickOnceZoneStatus.Text = "Off (default) - registry is not changed";
+            // 
+            // grpProcessProtection
+            // 
+            this.grpProcessProtection.Controls.Add(this.chkEnableTerminateProtection);
+            this.grpProcessProtection.Controls.Add(this.lblProcessProtectionInfo);
+            this.grpProcessProtection.Location = new System.Drawing.Point(9, 261);
+            this.grpProcessProtection.Margin = new System.Windows.Forms.Padding(2);
+            this.grpProcessProtection.Name = "grpProcessProtection";
+            this.grpProcessProtection.Padding = new System.Windows.Forms.Padding(2);
+            this.grpProcessProtection.Size = new System.Drawing.Size(453, 70);
+            this.grpProcessProtection.TabIndex = 6;
+            this.grpProcessProtection.TabStop = false;
+            this.grpProcessProtection.Text = "Process Protection";
+            // 
+            // chkEnableTerminateProtection
+            // 
+            this.chkEnableTerminateProtection.AutoSize = true;
+            this.chkEnableTerminateProtection.Location = new System.Drawing.Point(9, 18);
+            this.chkEnableTerminateProtection.Margin = new System.Windows.Forms.Padding(2);
+            this.chkEnableTerminateProtection.Name = "chkEnableTerminateProtection";
+            this.chkEnableTerminateProtection.Size = new System.Drawing.Size(307, 17);
+            this.chkEnableTerminateProtection.TabIndex = 0;
+            this.chkEnableTerminateProtection.Text = "Block Task Manager End Task for standard users";
+            this.chkEnableTerminateProtection.UseVisualStyleBackColor = true;
+            // 
+            // lblProcessProtectionInfo
+            // 
+            this.lblProcessProtectionInfo.Location = new System.Drawing.Point(9, 39);
+            this.lblProcessProtectionInfo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblProcessProtectionInfo.Name = "lblProcessProtectionInfo";
+            this.lblProcessProtectionInfo.Size = new System.Drawing.Size(435, 28);
+            this.lblProcessProtectionInfo.TabIndex = 1;
+            this.lblProcessProtectionInfo.Text = "Prevents accidental termination in kiosk setups. Exit from the tray menu still works.\r\nRestart TileKeeper to apply changes.";
             // 
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(181)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(95, 620);
+            this.btnClear.Location = new System.Drawing.Point(120, 620);
             this.btnClear.Margin = new System.Windows.Forms.Padding(2);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(75, 26);
+            this.btnClear.Size = new System.Drawing.Size(160, 26);
             this.btnClear.TabIndex = 13;
-            this.btnClear.Text = "Clear";
+            this.btnClear.Text = "Reset Programs && Layout";
             this.btnClear.UseVisualStyleBackColor = false;
             this.btnClear.Click += new System.EventHandler(this.BtnClear_Click);
             // 
@@ -1008,9 +1045,9 @@ namespace TileKeeper
             this.btnSave.Location = new System.Drawing.Point(14, 620);
             this.btnSave.Margin = new System.Windows.Forms.Padding(2);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 26);
+            this.btnSave.Size = new System.Drawing.Size(100, 26);
             this.btnSave.TabIndex = 12;
-            this.btnSave.Text = "Save";
+            this.btnSave.Text = "Save && Close";
             this.btnSave.UseVisualStyleBackColor = false;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
@@ -1097,6 +1134,9 @@ private TileKeeper.ColoredCheckedListBox checkedScreen1;
         private System.Windows.Forms.Label lblClickOnceZoneInfo;
         private System.Windows.Forms.Label lblClickOnceZoneStatus;
         private System.Windows.Forms.Button btnCleanupClickOnceZone;
+        private System.Windows.Forms.GroupBox grpProcessProtection;
+        private System.Windows.Forms.CheckBox chkEnableTerminateProtection;
+        private System.Windows.Forms.Label lblProcessProtectionInfo;
         private System.Windows.Forms.Label lblResWidth;
         private System.Windows.Forms.TextBox txtResWidth;
         private System.Windows.Forms.Label lblResHeight;

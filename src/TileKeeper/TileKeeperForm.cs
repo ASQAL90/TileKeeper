@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -90,26 +92,43 @@ namespace TileKeeper
         // waiting out the current cycle. Set on exit too so the keeper thread stops promptly.
         private readonly AutoResetEvent _positionWake = new AutoResetEvent(false);
 
+        // ── Update section (Display & Settings tab) ───────────────────────────
+        private GroupBox grpUpdate;
+        private Label lblCurrentVersion;
+        private Label lblUpdateStatus;
+        private Button btnCheckUpdates;
+        private Button btnOpenRelease;
+        private string _latestReleaseUrl = UpdateChecker.ReleasesPage;
+
         public TileKeeperForm()
         {
             InitializeComponent();
 
-            // Program list columns (not stored in the Designer file)
+            // Program list columns. The native checkbox is the per-row Enable switch;
+            // the first column is just its header, so the name/path live in columns 1/2.
+            // Widths are kept inside the 451px list so no horizontal scrolling is needed.
             listPrograms.View = View.Details;
-            listPrograms.Columns.Add("Program", 220);
-            listPrograms.Columns.Add("Path / Command", 380);
+            listPrograms.CheckBoxes = true;
+            listPrograms.Columns.Add("Enabled", 62);
+            listPrograms.Columns.Add("Program", 165);
+            listPrograms.Columns.Add("Path / Command", 222);
             listPrograms.FullRowSelect = true;
 
-            // Position-only program list column (not stored in the Designer file). CheckBoxes=true
-            // (set in the Designer) gives each row a checkbox — that IS the MatchLargestWindow flag.
+            // Position-only list. Its native checkbox is the per-row Enable switch for
+            // positioning; Match Largest Window moved to an explicit clickable column so
+            // the two switches can never be confused.
             listPositionPrograms.View = View.Details;
-            listPositionPrograms.Columns.Add("Program (check = match largest visible window)", 410);
+            listPositionPrograms.CheckBoxes = true;
+            listPositionPrograms.Columns.Add("Enabled", 62);
+            listPositionPrograms.Columns.Add("Program", 225);
+            listPositionPrograms.Columns.Add("Match largest", 145);
             listPositionPrograms.FullRowSelect = true;
             // Checking a row's box (Checked) and selecting it (Selected/blue highlight, what
             // Edit/Remove/Up/Down require) are independent WinForms ListView states — checking
             // a box never selects the row on its own. Sync check -> select so a checked row is
             // immediately actionable without an extra click.
             listPositionPrograms.ItemChecked += ListPositionPrograms_ItemChecked;
+            listPositionPrograms.MouseClick += ListPositionPrograms_MouseClick;
 
             // Double-buffer the form and the list/checklist controls that get rebuilt
             // wholesale on every tray show/reload — cuts the flicker from that rebuild.
@@ -218,10 +237,159 @@ namespace TileKeeper
             }
 
             ApplyScreenSectionEnableGate();
+            BuildUpdateSection();
 
             // Re-gate Screen3/4 (and rebuild grid previews) the instant a monitor is
             // plugged/unplugged, instead of only on the next tray show/reload.
             SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+        }
+
+        /// <summary>
+        /// Builds the small, self-contained update section on the Display &amp; Settings tab.
+        /// It only checks GitHub Releases and opens the release page — no executable is
+        /// downloaded or replaced, so the app keeps its signed-release trust model.
+        /// </summary>
+        private void BuildUpdateSection()
+        {
+            grpUpdate = new GroupBox
+            {
+                Text = "Application Update",
+                Location = new Point(9, 374),
+                Size = new Size(453, 112),
+                TabIndex = 7,
+                TabStop = false
+            };
+
+            lblCurrentVersion = new Label
+            {
+                AutoSize = true,
+                Location = new Point(9, 21),
+                Text = "Current version: " + Application.ProductVersion
+            };
+
+            btnCheckUpdates = new Button
+            {
+                Location = new Point(9, 45),
+                Size = new Size(132, 25),
+                Text = "Check for updates",
+                UseVisualStyleBackColor = true
+            };
+            btnCheckUpdates.Click += BtnCheckUpdates_Click;
+
+            btnOpenRelease = new Button
+            {
+                Location = new Point(149, 45),
+                Size = new Size(132, 25),
+                Text = "Open release page",
+                UseVisualStyleBackColor = true
+            };
+            btnOpenRelease.Click += delegate { OpenReleasePage(_latestReleaseUrl); };
+
+            lblUpdateStatus = new Label
+            {
+                Location = new Point(9, 77),
+                Size = new Size(435, 28),
+                Text = "Not checked yet."
+            };
+
+            grpUpdate.Controls.Add(lblCurrentVersion);
+            grpUpdate.Controls.Add(btnCheckUpdates);
+            grpUpdate.Controls.Add(btnOpenRelease);
+            grpUpdate.Controls.Add(lblUpdateStatus);
+            tabSystem.Controls.Add(grpUpdate);
+        }
+
+        /// <summary>Opens the validated GitHub release page in the user's browser.</summary>
+        private static void OpenReleasePage(string url)
+        {
+            if (!UpdateChecker.IsAllowedReleaseUrl(url))
+                url = UpdateChecker.ReleasesPage;
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"OpenReleasePage failed: {ex.Message}");
+                MessageBox.Show("Could not open the release page. Open this address in your browser:\n\n" +
+                                UpdateChecker.ReleasesPage,
+                                "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        /// <summary>Reads the latest release metadata from the public GitHub API.</summary>
+        private static async Task<string> FetchLatestReleaseJsonAsync()
+        {
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+            using (var client = new HttpClient())
+            {
+                client.Timeout = TimeSpan.FromSeconds(15);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("TileKeeper/" + Application.ProductVersion);
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+
+                using (HttpResponseMessage response = await client.GetAsync(UpdateChecker.LatestReleaseApi))
+                {
+                    if (!response.IsSuccessStatusCode)
+                        throw new InvalidOperationException($"GitHub returned HTTP {(int)response.StatusCode}.");
+                    return await response.Content.ReadAsStringAsync();
+                }
+            }
+        }
+
+        /// <summary>Checks GitHub Releases and reports the result; never modifies local files.</summary>
+        private async void BtnCheckUpdates_Click(object sender, EventArgs e)
+        {
+            btnCheckUpdates.Enabled = false;
+            btnOpenRelease.Enabled = false;
+            lblUpdateStatus.Text = "Checking for updates...";
+
+            try
+            {
+                string json = await FetchLatestReleaseJsonAsync();
+                if (IsDisposed)
+                    return;
+
+                if (!UpdateChecker.TryParseLatestRelease(json, out UpdateChecker.ReleaseInfo info, out string error))
+                {
+                    _latestReleaseUrl = UpdateChecker.ReleasesPage;
+                    lblUpdateStatus.Text = error;
+                    btnOpenRelease.Enabled = true;
+                    return;
+                }
+
+                _latestReleaseUrl = info.ReleaseUrl;
+                btnOpenRelease.Enabled = true;
+
+                string current = Application.ProductVersion;
+                if (UpdateChecker.IsNewerVersion(current, info.Version))
+                {
+                    lblUpdateStatus.Text = "Update available: " + info.Version;
+                    DialogResult answer = MessageBox.Show(this,
+                        "A newer version is available.\r\n\r\n" +
+                        "Installed: " + current + "\r\n" +
+                        "Latest: " + info.Version + "\r\n\r\n" +
+                        "Open the release page to download it?",
+                        "Update available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (answer == DialogResult.Yes)
+                        OpenReleasePage(info.ReleaseUrl);
+                }
+                else
+                {
+                    lblUpdateStatus.Text = "You are using the latest version.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Update check failed: {ex.Message}");
+                _latestReleaseUrl = UpdateChecker.ReleasesPage;
+                lblUpdateStatus.Text = "Could not check for updates. Open the release page manually.";
+                btnOpenRelease.Enabled = true;
+            }
+            finally
+            {
+                btnCheckUpdates.Enabled = true;
+            }
         }
 
         private void OnDisplaySettingsChanged(object sender, EventArgs e)
@@ -377,6 +545,12 @@ namespace TileKeeper
             chkEnableClickOnceZone.Checked = IsClickOnceZoneEnabled();
             UpdateClickOnceZoneStatus();
 
+            // Process termination protection (default on). The DACL is applied during
+            // Program.Main, so a change here takes effect after TileKeeper restarts.
+            string protectValue = GetConfigValue("EnableTerminateProtection", "True");
+            chkEnableTerminateProtection.Checked =
+                !bool.TryParse(protectValue, out bool protectProcess) || protectProcess;
+
             // Convert the config values (seconds) to milliseconds for Thread.Sleep
             monitorTimer       = int.Parse(txtCycle.Text)       * 1000;
             keepScreenPosTimer = int.Parse(txtCycleScreen.Text) * 1000;
@@ -481,8 +655,10 @@ namespace TileKeeper
                                              // instead of MainWindowHandle (see WindowMonitor.MatchLargest)
             public bool PositionOnly;       // true = came from the Position tab's own list, not the
                                              // Programs tab — never launched/relaunched by Keep Running.
+            public bool Enabled;            // per-list switch: relaunch (Programs tab) or positioning
+                                             // (Position tab). Missing config values default to true.
 
-            public ProgramEntry(string name, string path, bool matchLargestWindow = false, bool positionOnly = false)
+            public ProgramEntry(string name, string path, bool matchLargestWindow = false, bool positionOnly = false, bool enabled = true)
             {
                 Name = name ?? "";
                 Path = path ?? "";
@@ -490,6 +666,7 @@ namespace TileKeeper
                 Key = BaseName; // refined by AssignIdentityKeys once the full list is known
                 MatchLargestWindow = matchLargestWindow;
                 PositionOnly = positionOnly;
+                Enabled = enabled;
             }
         }
 
@@ -530,12 +707,31 @@ namespace TileKeeper
             }
         }
 
+        // Row layout is: [0] checkbox/header only, [1] name, [2] path or Match-largest glyph.
+        private const string MatchLargestOn  = "\u2611"; // ☑
+        private const string MatchLargestOff = "\u2610"; // ☐
+
+        private static string RowName(ListViewItem item) =>
+            item.SubItems.Count > 1 ? item.SubItems[1].Text : item.Text;
+
+        private static string RowPath(ListViewItem item) =>
+            item.SubItems.Count > 2 ? item.SubItems[2].Text : "";
+
+        private static bool RowMatchLargest(ListViewItem item) =>
+            item.SubItems.Count > 2 && item.SubItems[2].Text == MatchLargestOn;
+
+        private static ListViewItem NewProgramRow(string name, string path, bool enabled) =>
+            new ListViewItem(new[] { "", name, path }) { Checked = enabled };
+
+        private static ListViewItem NewPositionRow(string name, bool matchLargest, bool enabled) =>
+            new ListViewItem(new[] { "", name, matchLargest ? MatchLargestOn : MatchLargestOff }) { Checked = enabled };
+
         /// <summary>Builds the program entries currently shown in the ListView.</summary>
         private List<ProgramEntry> GetProgramEntries()
         {
             var list = new List<ProgramEntry>();
             foreach (ListViewItem item in listPrograms.Items)
-                list.Add(new ProgramEntry(item.Text, item.SubItems.Count > 1 ? item.SubItems[1].Text : ""));
+                list.Add(new ProgramEntry(RowName(item), RowPath(item), enabled: item.Checked));
             AssignIdentityKeys(list);
             return list;
         }
@@ -547,7 +743,7 @@ namespace TileKeeper
             {
                 listPrograms.Items.Clear();
                 foreach (var e in entries)
-                    listPrograms.Items.Add(new ListViewItem(new[] { e.Name, e.Path }));
+                    listPrograms.Items.Add(NewProgramRow(e.Name, e.Path, e.Enabled));
             }
             finally
             {
@@ -555,7 +751,7 @@ namespace TileKeeper
             }
         }
 
-        /// <summary>Reads ProgramName/ProgramPath from config into parallel entries.</summary>
+        /// <summary>Reads ProgramName/ProgramPath/ProgramEnabled from config into parallel entries.</summary>
         private List<ProgramEntry> LoadEntriesFromConfig()
         {
             var result = new List<ProgramEntry>();
@@ -564,9 +760,10 @@ namespace TileKeeper
 
             string[] names = GetConfigValue("ProgramName", "").Split(',');
             string[] paths = SplitProgramPaths(GetConfigValue("ProgramPath", ""));
+            bool[] enabled = ProgramEnableFlags.Parse(GetConfigValue("ProgramEnabled", ""), names.Length);
 
             for (int i = 0; i < names.Length && i < paths.Length; i++)
-                result.Add(new ProgramEntry(names[i], paths[i]));
+                result.Add(new ProgramEntry(names[i], paths[i], enabled: enabled[i]));
             AssignIdentityKeys(result);
             return result;
         }
@@ -576,12 +773,13 @@ namespace TileKeeper
         {
             var list = new List<ProgramEntry>();
             foreach (ListViewItem item in listPositionPrograms.Items)
-                list.Add(new ProgramEntry(item.Text, "", matchLargestWindow: item.Checked, positionOnly: true));
+                list.Add(new ProgramEntry(RowName(item), "", matchLargestWindow: RowMatchLargest(item),
+                                          positionOnly: true, enabled: item.Checked));
             AssignIdentityKeys(list);
             return list;
         }
 
-        /// <summary>Reads PositionProgramName/PositionProgramMatchLargest from config into parallel entries.</summary>
+        /// <summary>Reads PositionProgramName/MatchLargest/Enabled from config into parallel entries.</summary>
         private List<ProgramEntry> LoadPositionEntriesFromConfig()
         {
             var result = new List<ProgramEntry>();
@@ -591,11 +789,13 @@ namespace TileKeeper
 
             string[] names = namesCsv.Split(',');
             string[] matches = GetConfigValue("PositionProgramMatchLargest", "").Split(',');
+            bool[] enabled = ProgramEnableFlags.Parse(GetConfigValue("PositionProgramEnabled", ""), names.Length);
 
             for (int i = 0; i < names.Length; i++)
             {
                 bool matchLargest = i < matches.Length && matches[i].Trim() == "1";
-                result.Add(new ProgramEntry(names[i], "", matchLargestWindow: matchLargest, positionOnly: true));
+                result.Add(new ProgramEntry(names[i], "", matchLargestWindow: matchLargest,
+                                            positionOnly: true, enabled: enabled[i]));
             }
             AssignIdentityKeys(result);
             return result;
@@ -608,10 +808,7 @@ namespace TileKeeper
             {
                 listPositionPrograms.Items.Clear();
                 foreach (var e in entries)
-                {
-                    var item = new ListViewItem(e.Name) { Checked = e.MatchLargestWindow };
-                    listPositionPrograms.Items.Add(item);
-                }
+                    listPositionPrograms.Items.Add(NewPositionRow(e.Name, e.MatchLargestWindow, e.Enabled));
             }
             finally
             {
@@ -1157,6 +1354,9 @@ namespace TileKeeper
                     bool.TryParse(ConfigurationManager.AppSettings["EnablePersistRun"], out bool enablePersistRun);
                     bool.TryParse(ConfigurationManager.AppSettings["EnableMonitoring"],   out bool enableMonitoring);
 
+                    bool[] programEnabled = ProgramEnableFlags.Parse(
+                        GetConfigValue("ProgramEnabled", ""), programName.Length);
+
                     if (enablePersistRun && programName.Length > 0 && programPath.Length > 0)
                     {
                         var tasks = new List<Task>();
@@ -1169,8 +1369,12 @@ namespace TileKeeper
                             {
                                 try
                                 {
-                                    string fullProgramPath = BuildFullPath(programName[index], programPath[index]);
+                                    // A disabled row is temporarily excluded from relaunching.
+                                    // Its config entry stays intact, so re-checking Enable resumes it.
+                                    if (!programEnabled[index] || index >= programPath.Length)
+                                        return;
 
+                                    string fullProgramPath = BuildFullPath(programName[index], programPath[index]);
                                     if (string.IsNullOrEmpty(fullProgramPath))
                                         return;
 
@@ -1334,7 +1538,8 @@ namespace TileKeeper
         /// entry (stale/legacy config value) falls back to treating the Key itself as a bare,
         /// args-less, MainWindowHandle-matched process name.
         /// </summary>
-        private void ResolveScreenPrograms(List<string> keys, out List<string> programs, out List<string> args, out List<bool> matchLargest)
+        private void ResolveScreenPrograms(List<string> keys, out List<string> programs, out List<string> args,
+                                           out List<bool> matchLargest, out List<int> keptIndexes)
         {
             var byKey = new Dictionary<string, ProgramEntry>(StringComparer.OrdinalIgnoreCase);
             foreach (var e in LoadAllPositionableEntriesFromConfig())
@@ -1344,9 +1549,18 @@ namespace TileKeeper
             programs = new List<string>();
             args = new List<string>();
             matchLargest = new List<bool>();
-            foreach (var k in keys)
+            keptIndexes = new List<int>();
+            for (int i = 0; i < keys.Count; i++)
             {
-                if (byKey.TryGetValue(k, out ProgramEntry e))
+                string k = keys[i];
+
+                // The Position tab's Enable checkbox only affects position-only rows.
+                // Launch entries keep their own Enable switch for the Keep Running watchdog.
+                if (byKey.TryGetValue(k, out ProgramEntry e) && e.PositionOnly && !e.Enabled)
+                    continue;
+
+                keptIndexes.Add(i);
+                if (e != null)
                 {
                     programs.Add(e.BaseName);
                     args.Add(e.BaseArgs);
@@ -1418,13 +1632,20 @@ namespace TileKeeper
                             // Live checkbox state, not saved config — a Borderless toggle takes
                             // effect on the next pass without needing Save (Save still persists it).
                             bool borderless = GetBorderlessForScreen(i);
-                            ResolveScreenPrograms(screenLists[i], out List<string> programs, out List<string> args, out List<bool> matchLargest);
+                            ResolveScreenPrograms(screenLists[i], out List<string> programs, out List<string> args,
+                                                  out List<bool> matchLargest, out List<int> keptIndexes);
+                            int[] configuredSlots = SlotsFromConfig(
+                                GetConfigValue("Screen" + (i + 1) + "Slots", ""), screenLists[i].Count);
+                            var slots = new int[programs.Count];
+                            for (int k = 0; k < keptIndexes.Count; k++)
+                                slots[k] = keptIndexes[k] < configuredSlots.Length ? configuredSlots[keptIndexes[k]] : -1;
+
                             assignments.Add(new ScreenAssignment(
                                 programs,
                                 autoFit,
                                 GridOrZero(GetConfigValue("GridRows" + (i + 1), "0")),
                                 GridOrZero(GetConfigValue("GridCols" + (i + 1), "0")),
-                                SlotsFromConfig(GetConfigValue("Screen" + (i + 1) + "Slots", ""), screenLists[i].Count),
+                                slots,
                                 args,
                                 matchLargest,
                                 borderless));
@@ -1620,8 +1841,8 @@ namespace TileKeeper
         {
             var requiredKeys = new List<string>
             {
-                "ProgramName", "ProgramPath", "CycleSeconds", "EnablePersistRun",
-                "PositionProgramName", "PositionProgramMatchLargest",
+                "ProgramName", "ProgramPath", "ProgramEnabled", "CycleSeconds", "EnablePersistRun",
+                "PositionProgramName", "PositionProgramMatchLargest", "PositionProgramEnabled",
                 "Screen1", "Screen2", "Screen1AutoFit", "Screen2AutoFit",
                 "Screen1Borderless", "Screen2Borderless",
                 "GridRows1", "GridCols1", "GridRows2", "GridCols2",
@@ -1629,7 +1850,7 @@ namespace TileKeeper
                 "CycleKeepScreen", "EnableCustomPosition",
                 "CpuUsage", "MemUsage", "EnableMonitoring",
                 "EnableResolutionHold", "ResolutionWidth", "ResolutionHeight", "ResolutionCheckSeconds",
-                "EnableClickOnceIntranetZone", "IntranetZoneManagedHosts",
+                "EnableClickOnceIntranetZone", "IntranetZoneManagedHosts", "EnableTerminateProtection",
                 "ClientSettingsProvider.ServiceUri",
                 // Screen3/Screen4 are always saved now (BtnSave_Click no longer gates them on
                 // monitor detection), so their keys must always exist too, regardless of how
@@ -1727,12 +1948,12 @@ namespace TileKeeper
         {
             if (chkEnableClickOnceZone.Checked)
             {
-                lblClickOnceZoneStatus.Text = "Aktif — host privat saja";
+                lblClickOnceZoneStatus.Text = "On - private hosts only";
                 lblClickOnceZoneStatus.ForeColor = Color.FromArgb(0, 120, 70);
             }
             else
             {
-                lblClickOnceZoneStatus.Text = "Nonaktif (default) — tidak menulis registry";
+                lblClickOnceZoneStatus.Text = "Off (default) - registry is not changed";
                 lblClickOnceZoneStatus.ForeColor = Color.FromArgb(90, 90, 90);
             }
         }
@@ -1746,9 +1967,9 @@ namespace TileKeeper
         {
             DialogResult answer = MessageBox.Show(
                 this,
-                "Hapus entri Intranet Zone yang dibuat TileKeeper untuk server ClickOnce yang terdaftar?\r\n\r\n" +
-                "Hanya entri host privat/intranet milik konfigurasi ini yang dihapus; entri lain tidak disentuh.",
-                "Bersihkan entri registry",
+                "Remove the Intranet Zone entries that TileKeeper created for the configured ClickOnce servers?\r\n\r\n" +
+                "Only private/intranet hosts from this configuration are removed; other entries are left untouched.",
+                "Clear registry entries",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button2);
@@ -1761,9 +1982,9 @@ namespace TileKeeper
             MessageBox.Show(
                 this,
                 removed > 0
-                    ? $"{removed} entri Intranet Zone dihapus."
-                    : "Tidak ada entri Intranet Zone yang perlu dihapus.",
-                "Bersihkan entri registry",
+                    ? $"{removed} Intranet Zone entries removed."
+                    : "No Intranet Zone entries needed to be removed.",
+                "Clear registry entries",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
@@ -1807,11 +2028,13 @@ namespace TileKeeper
             // Programs list
             SaveSettings("ProgramName", string.Join(",", entries.Select(x => x.Name)));
             SaveSettings("ProgramPath", string.Join(",", entries.Select(x => x.Path)));
+            SaveSettings("ProgramEnabled", ProgramEnableFlags.Serialize(entries.Select(x => x.Enabled)));
 
             // Position-only programs list (added from the Position tab; never launched by Keep Running)
             var positionEntries = GetPositionEntries();
             SaveSettings("PositionProgramName", string.Join(",", positionEntries.Select(x => x.Name)));
             SaveSettings("PositionProgramMatchLargest", string.Join(",", positionEntries.Select(x => x.MatchLargestWindow ? "1" : "0")));
+            SaveSettings("PositionProgramEnabled", ProgramEnableFlags.Serialize(positionEntries.Select(x => x.Enabled)));
 
             // Process-persistence settings
             SaveSettings("CycleSeconds", txtCycle.Text);
@@ -1860,6 +2083,7 @@ namespace TileKeeper
             // Registry / Intranet Zone (opt-in). Disabling removes only the entries
             // TileKeeper added, so the checkbox is a real on/off switch.
             SaveSettings(RemoteDesktopManager.EnableSettingKey, chkEnableClickOnceZone.Checked.ToString());
+            SaveSettings("EnableTerminateProtection", chkEnableTerminateProtection.Checked.ToString());
             BackupConfig();
             if (chkEnableClickOnceZone.Checked)
             {
@@ -1872,8 +2096,8 @@ namespace TileKeeper
                 if (removed > 0)
                 {
                     MessageBox.Show(
-                        $"{removed} entri Intranet Zone yang dibuat TileKeeper telah dihapus karena opsi dimatikan.",
-                        "Registry dibersihkan",
+                        $"{removed} Intranet Zone entries created by TileKeeper were removed because the option was turned off.",
+                        "Registry cleaned up",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
                 }
@@ -1954,8 +2178,8 @@ namespace TileKeeper
                 if (ListContainsName(listPrograms, name, item))
                     return; // silent — renaming onto an existing row is skipped like Add
 
-                item.Text     = name;
-                item.SubItems[1].Text = path;
+                item.SubItems[1].Text = name;
+                item.SubItems[2].Text = path;
             }
 
             RebuildScreenCandidates();
@@ -2016,7 +2240,7 @@ namespace TileKeeper
                 if (ListContainsName(listPositionPrograms, name, item))
                     return; // silent — renaming onto an existing row is skipped like Add
 
-                item.Text = name;
+                item.SubItems[1].Text = name;
             }
 
             RebuildScreenCandidates();
@@ -2032,14 +2256,26 @@ namespace TileKeeper
         }
 
         /// <summary>
-        /// Selects a row when its checkbox is checked, so Edit/Remove (which act on
-        /// SelectedItems) work immediately on that row without an extra click to select it.
-        /// Only checking selects — unchecking a row doesn't steal selection from elsewhere.
+        /// Selects a row when its Enable checkbox is checked, so Edit/Remove act on that row
+        /// without an extra click. Only checking selects — unchecking leaves selection alone.
         /// </summary>
         private void ListPositionPrograms_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             if (e.Item.Checked)
                 e.Item.Selected = true;
+        }
+
+        /// <summary>Clicking the Match-largest column flips its checkbox glyph, not the Enable box.</summary>
+        private void ListPositionPrograms_MouseClick(object sender, MouseEventArgs e)
+        {
+            ListViewHitTestInfo hit = listPositionPrograms.HitTest(e.Location);
+            if (hit.Item == null || hit.SubItem == null)
+                return;
+            if (hit.Item.SubItems.IndexOf(hit.SubItem) != 2)
+                return;
+
+            hit.SubItem.Text = hit.SubItem.Text == MatchLargestOn ? MatchLargestOff : MatchLargestOn;
+            hit.Item.Selected = true;
         }
 
         /// <summary>
@@ -2059,7 +2295,7 @@ namespace TileKeeper
             if (ListContainsName(listPositionPrograms, name, null))
                 return false;
 
-            listPositionPrograms.Items.Add(new ListViewItem(name));
+            listPositionPrograms.Items.Add(NewPositionRow(name, false, true));
             return true;
         }
 
@@ -2071,7 +2307,7 @@ namespace TileKeeper
         private static bool ListContainsName(ListView list, string name, ListViewItem ignore)
         {
             foreach (ListViewItem item in list.Items)
-                if (item != ignore && string.Equals(item.Text, name, StringComparison.OrdinalIgnoreCase))
+                if (item != ignore && string.Equals(RowName(item), name, StringComparison.OrdinalIgnoreCase))
                     return true;
             return false;
         }
@@ -2141,7 +2377,7 @@ namespace TileKeeper
             if (ListContainsName(listPrograms, name, null))
                 return false;
 
-            listPrograms.Items.Add(new ListViewItem(new[] { name, path }));
+            listPrograms.Items.Add(NewProgramRow(name, path, true));
             return true;
         }
 
@@ -2376,7 +2612,11 @@ namespace TileKeeper
         // Miscellaneous UI handlers
         // ─────────────────────────────────────────────────────────────────────
 
-        /// <summary>Clears the program/position form fields back to their defaults.</summary>
+        /// <summary>
+        /// Resets the editable program lists, screen assignments, and layout options to their
+        /// defaults in the current form. It does not delete the saved configuration until Save
+        /// is clicked, and it leaves cycle intervals, display hold, and update settings alone.
+        /// </summary>
         private void BtnClear_Click(object sender, EventArgs e)
         {
             listPrograms.Items.Clear();
