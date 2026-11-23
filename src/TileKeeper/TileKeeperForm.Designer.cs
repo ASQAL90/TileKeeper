@@ -441,7 +441,7 @@ namespace TileKeeper
             // chkAutoFit1
             // 
             this.chkAutoFit1.AutoSize = true;
-            this.chkAutoFit1.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit1.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit1.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit1.Name = "chkAutoFit1";
             this.chkAutoFit1.Size = new System.Drawing.Size(59, 17);
@@ -454,7 +454,7 @@ namespace TileKeeper
             this.chkBorderless1.AutoSize = true;
             this.chkBorderless1.Checked = true;
             this.chkBorderless1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless1.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless1.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless1.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless1.Name = "chkBorderless1";
             this.chkBorderless1.Size = new System.Drawing.Size(75, 17);
@@ -547,7 +547,7 @@ namespace TileKeeper
             // chkAutoFit2
             // 
             this.chkAutoFit2.AutoSize = true;
-            this.chkAutoFit2.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit2.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit2.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit2.Name = "chkAutoFit2";
             this.chkAutoFit2.Size = new System.Drawing.Size(59, 17);
@@ -560,7 +560,7 @@ namespace TileKeeper
             this.chkBorderless2.AutoSize = true;
             this.chkBorderless2.Checked = true;
             this.chkBorderless2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless2.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless2.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless2.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless2.Name = "chkBorderless2";
             this.chkBorderless2.Size = new System.Drawing.Size(75, 17);
@@ -653,7 +653,7 @@ namespace TileKeeper
             // chkAutoFit3
             // 
             this.chkAutoFit3.AutoSize = true;
-            this.chkAutoFit3.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit3.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit3.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit3.Name = "chkAutoFit3";
             this.chkAutoFit3.Size = new System.Drawing.Size(59, 17);
@@ -666,7 +666,7 @@ namespace TileKeeper
             this.chkBorderless3.AutoSize = true;
             this.chkBorderless3.Checked = true;
             this.chkBorderless3.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless3.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless3.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless3.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless3.Name = "chkBorderless3";
             this.chkBorderless3.Size = new System.Drawing.Size(75, 17);
@@ -759,7 +759,7 @@ namespace TileKeeper
             // chkAutoFit4
             // 
             this.chkAutoFit4.AutoSize = true;
-            this.chkAutoFit4.Location = new System.Drawing.Point(130, 66);
+            this.chkAutoFit4.Location = new System.Drawing.Point(133, 66);
             this.chkAutoFit4.Margin = new System.Windows.Forms.Padding(2);
             this.chkAutoFit4.Name = "chkAutoFit4";
             this.chkAutoFit4.Size = new System.Drawing.Size(59, 17);
@@ -772,7 +772,7 @@ namespace TileKeeper
             this.chkBorderless4.AutoSize = true;
             this.chkBorderless4.Checked = true;
             this.chkBorderless4.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBorderless4.Location = new System.Drawing.Point(130, 85);
+            this.chkBorderless4.Location = new System.Drawing.Point(133, 85);
             this.chkBorderless4.Margin = new System.Windows.Forms.Padding(2);
             this.chkBorderless4.Name = "chkBorderless4";
             this.chkBorderless4.Size = new System.Drawing.Size(75, 17);
