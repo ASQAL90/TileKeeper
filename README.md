@@ -30,6 +30,8 @@ Dia juga ingat di monitor dan kolom mana setiap jendela harus ditempatkan. Maksi
 - **Borderless**: hilangkan title bar supaya rapat edge-to-edge.
 - **Argument-aware**: aplikasi yang sama dengan argumen beda dianggap jendela terpisah.
 - **Largest window**: kalau satu aplikasi punya banyak jendela, pilih yang terbesar.
+- **Enabled per aplikasi**: checkbox di tiap daftar bisa dimatikan sementara tanpa menghapus entri. Di tab **Keep Apps Running** itu menghentikan penjagaan agar tidak dijalankan ulang; di tab **Arrange Windows** itu menghentikan penataan jendela. Efeknya terpisah.
+- **Update check**: di tab **Display & Settings**, TileKeeper bisa mengecek rilis terbaru di GitHub lalu membuka halaman unduhannya. Aplikasi tidak mengganti file sendiri otomatis.
 
 Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun yang jendelanya perlu dijaga tetap di tempatnya — termasuk layar Andon: papan performa, counting produksi, dashboard, dan aplikasi sejenis tampil berdampingan di satu layar, dan selalu kembali ke tempatnya meski layar dimatikan lalu dihidupkan lagi. Kalau mau jalan otomatis dari awal Windows nyala, simpan shortcut TileKeeper ke folder Startup (Win+R → `shell:startup` → tempel shortcut-nya).
 
@@ -37,9 +39,9 @@ Cocok buat monitoring SCADA dan aplikasi VNC/RDP, tapi bisa dipakai buat apa pun
 
 1. Unduh `TileKeeper.exe` dari Releases (butuh .NET Framework 4.8).
 2. Jalankan; ikon muncul di tray.
-3. Klik kanan ikon → **Show**, buka tab **Programs**, klik **Add...**, dan pilih `.lnk`, `.appref-ms`, `.rdp`, `.vnc`, atau `.exe`.
+3. Klik kanan ikon → **Show**, buka tab **Keep Apps Running**, klik **Add...**, dan pilih `.lnk`, `.appref-ms`, `.rdp`, `.vnc`, atau `.exe`.
 4. Nyalakan **Keep Running** dan atur interval (15–30 detik sudah cukup).
-5. Buka tab **Position**, centang aplikasi di layar yang diinginkan, atur **Rows**/**Cols**.
+5. Buka tab **Arrange Windows**, centang aplikasi di layar yang diinginkan, atur **Rows**/**Cols**.
 6. Klik cell di preview untuk pin aplikasi ke cell tertentu.
 7. Klik **Save**. Selesai.
 
@@ -49,14 +51,14 @@ Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tamb
 
 |  |  |
 |---|---|
-| ![Programs tab](site/screenshot-programs.png) | ![Position tab](site/screenshot-position.png) |
-| Programs — daftar aplikasi yang dijaga | Position — layar 1–4, cell 3×3, AutoFit, Borderless |
-| ![System tab](site/screenshot-system.png) | ![Tray menu](site/screenshot-tray-menu.png) |
-| System — display resolution hold | Tray menu — Show, About, Exit |
+| ![Keep Apps Running tab](site/screenshot-programs.png) | ![Arrange Windows tab](site/screenshot-position.png) |
+| Keep Apps Running — daftar aplikasi, checkbox **Enabled**, kolom Program dan Path | Arrange Windows — layar 1–4, cell 3×3, AutoFit, Borderless |
+| ![Display & Settings tab](site/screenshot-system.png) | ![Tray menu](site/screenshot-tray-menu.png) |
+| Display & Settings — display resolution hold dan update check | Tray menu — Show, About, Exit |
 
 ## Menambah program
 
-Ada dua cara: seret file dari Explorer langsung ke daftar (tab **Programs** atau **Position**), atau klik **Add…** lalu pilih filenya — bisa beberapa sekaligus. **Edit…** mengganti file pada baris yang sudah ada, **Remove** menghapusnya.
+Ada dua cara: seret file dari Explorer langsung ke daftar (tab **Keep Apps Running** atau **Arrange Windows**), atau klik **Add…** lalu pilih filenya — bisa beberapa sekaligus. **Edit…** mengganti file pada baris yang sudah ada, **Remove** menghapusnya.
 
 ![Tombol Add dan area drop](site/screenshot-programs-annotated.png)
 

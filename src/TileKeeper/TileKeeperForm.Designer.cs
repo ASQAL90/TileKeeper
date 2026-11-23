@@ -147,7 +147,7 @@ namespace TileKeeper
             this.tabPrograms.Padding = new System.Windows.Forms.Padding(2);
             this.tabPrograms.Size = new System.Drawing.Size(469, 580);
             this.tabPrograms.TabIndex = 0;
-            this.tabPrograms.Text = "Programs";
+            this.tabPrograms.Text = "Keep Apps Running";
             this.tabPrograms.UseVisualStyleBackColor = true;
             // 
             // lblPgmHint
@@ -258,7 +258,7 @@ namespace TileKeeper
             this.tabPosition.Padding = new System.Windows.Forms.Padding(2);
             this.tabPosition.Size = new System.Drawing.Size(469, 580);
             this.tabPosition.TabIndex = 1;
-            this.tabPosition.Text = "Position";
+            this.tabPosition.Text = "Arrange Windows";
             this.tabPosition.UseVisualStyleBackColor = true;
             // 
             // lblPosHint
@@ -803,12 +803,12 @@ namespace TileKeeper
             this.tabSystem.Padding = new System.Windows.Forms.Padding(2);
             this.tabSystem.Size = new System.Drawing.Size(469, 580);
             this.tabSystem.TabIndex = 2;
-            this.tabSystem.Text = "System";
+            this.tabSystem.Text = "Display & Settings";
             this.tabSystem.UseVisualStyleBackColor = true;
             //
             // btnAbout
             //
-            this.btnAbout.Location = new System.Drawing.Point(9, 234);
+            this.btnAbout.Location = new System.Drawing.Point(9, 258);
             this.btnAbout.Margin = new System.Windows.Forms.Padding(2);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(93, 27);
@@ -940,10 +940,10 @@ namespace TileKeeper
             this.grpRegistry.Margin = new System.Windows.Forms.Padding(2);
             this.grpRegistry.Name = "grpRegistry";
             this.grpRegistry.Padding = new System.Windows.Forms.Padding(2);
-            this.grpRegistry.Size = new System.Drawing.Size(453, 130);
+            this.grpRegistry.Size = new System.Drawing.Size(453, 154);
             this.grpRegistry.TabIndex = 5;
             this.grpRegistry.TabStop = false;
-            this.grpRegistry.Text = "Registry — ClickOnce / SmartScreen (opsional)";
+            this.grpRegistry.Text = "Registry - ClickOnce / SmartScreen (optional)";
             // 
             // chkEnableClickOnceZone
             // 
@@ -953,7 +953,7 @@ namespace TileKeeper
             this.chkEnableClickOnceZone.Name = "chkEnableClickOnceZone";
             this.chkEnableClickOnceZone.Size = new System.Drawing.Size(360, 17);
             this.chkEnableClickOnceZone.TabIndex = 0;
-            this.chkEnableClickOnceZone.Text = "Izinkan pengecualian SmartScreen untuk server ClickOnce privat";
+            this.chkEnableClickOnceZone.Text = "Allow SmartScreen exception for private ClickOnce servers";
             this.chkEnableClickOnceZone.UseVisualStyleBackColor = true;
             this.chkEnableClickOnceZone.CheckedChanged += new System.EventHandler(this.ChkEnableClickOnceZone_CheckedChanged);
             // 
@@ -962,29 +962,29 @@ namespace TileKeeper
             this.lblClickOnceZoneInfo.Location = new System.Drawing.Point(9, 39);
             this.lblClickOnceZoneInfo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblClickOnceZoneInfo.Name = "lblClickOnceZoneInfo";
-            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 54);
+            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 78);
             this.lblClickOnceZoneInfo.TabIndex = 1;
-            this.lblClickOnceZoneInfo.Text = "Fungsi: update ClickOnce tanpa peringatan SmartScreen.\r\nRisiko: Windows lebih mempercayai server itu.\r\nHanya host privat/intranet yang diterima; host publik ditolak.\r\nDefault mati. Nyalakan hanya untuk server milik Anda.";
+            this.lblClickOnceZoneInfo.Text = "What it does: lets ClickOnce apps update without SmartScreen warnings.\r\nRisk: Windows will trust that server more.\r\nOnly private/intranet hosts are accepted; public hosts are rejected.\r\nOff by default. Enable it only for servers you own.";
             // 
             // btnCleanupClickOnceZone
             // 
-            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 98);
+            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 122);
             this.btnCleanupClickOnceZone.Margin = new System.Windows.Forms.Padding(2);
             this.btnCleanupClickOnceZone.Name = "btnCleanupClickOnceZone";
             this.btnCleanupClickOnceZone.Size = new System.Drawing.Size(148, 23);
             this.btnCleanupClickOnceZone.TabIndex = 2;
-            this.btnCleanupClickOnceZone.Text = "Bersihkan entri registry";
+            this.btnCleanupClickOnceZone.Text = "Clear registry entries";
             this.btnCleanupClickOnceZone.UseVisualStyleBackColor = true;
             this.btnCleanupClickOnceZone.Click += new System.EventHandler(this.BtnCleanupClickOnceZone_Click);
             // 
             // lblClickOnceZoneStatus
             // 
-            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 102);
+            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 126);
             this.lblClickOnceZoneStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblClickOnceZoneStatus.Name = "lblClickOnceZoneStatus";
             this.lblClickOnceZoneStatus.Size = new System.Drawing.Size(281, 18);
             this.lblClickOnceZoneStatus.TabIndex = 3;
-            this.lblClickOnceZoneStatus.Text = "Nonaktif (default) — tidak menulis registry";
+            this.lblClickOnceZoneStatus.Text = "Off (default) - registry is not changed";
             // 
             // btnClear
             // 
