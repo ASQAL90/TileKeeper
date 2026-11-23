@@ -96,6 +96,11 @@ namespace TileKeeper
             this.txtResWidth = new System.Windows.Forms.TextBox();
             this.lblResWidth = new System.Windows.Forms.Label();
             this.chkEnableRes = new System.Windows.Forms.CheckBox();
+            this.grpRegistry = new System.Windows.Forms.GroupBox();
+            this.chkEnableClickOnceZone = new System.Windows.Forms.CheckBox();
+            this.lblClickOnceZoneInfo = new System.Windows.Forms.Label();
+            this.lblClickOnceZoneStatus = new System.Windows.Forms.Label();
+            this.btnCleanupClickOnceZone = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.tabMain.SuspendLayout();
@@ -108,6 +113,7 @@ namespace TileKeeper
             this.grpScreen4.SuspendLayout();
             this.tabSystem.SuspendLayout();
             this.grpResolution.SuspendLayout();
+            this.grpRegistry.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMain
@@ -789,6 +795,7 @@ namespace TileKeeper
             // tabSystem
             // 
             this.tabSystem.Controls.Add(this.btnAbout);
+            this.tabSystem.Controls.Add(this.grpRegistry);
             this.tabSystem.Controls.Add(this.grpResolution);
             this.tabSystem.Location = new System.Drawing.Point(4, 22);
             this.tabSystem.Margin = new System.Windows.Forms.Padding(2);
@@ -801,7 +808,7 @@ namespace TileKeeper
             //
             // btnAbout
             //
-            this.btnAbout.Location = new System.Drawing.Point(9, 105);
+            this.btnAbout.Location = new System.Drawing.Point(9, 234);
             this.btnAbout.Margin = new System.Windows.Forms.Padding(2);
             this.btnAbout.Name = "btnAbout";
             this.btnAbout.Size = new System.Drawing.Size(93, 27);
@@ -923,6 +930,62 @@ namespace TileKeeper
             this.chkEnableRes.Text = "Hold display resolution (clamp oversized displays)";
             this.chkEnableRes.UseVisualStyleBackColor = true;
             // 
+            // grpRegistry
+            // 
+            this.grpRegistry.Controls.Add(this.btnCleanupClickOnceZone);
+            this.grpRegistry.Controls.Add(this.lblClickOnceZoneStatus);
+            this.grpRegistry.Controls.Add(this.lblClickOnceZoneInfo);
+            this.grpRegistry.Controls.Add(this.chkEnableClickOnceZone);
+            this.grpRegistry.Location = new System.Drawing.Point(9, 97);
+            this.grpRegistry.Margin = new System.Windows.Forms.Padding(2);
+            this.grpRegistry.Name = "grpRegistry";
+            this.grpRegistry.Padding = new System.Windows.Forms.Padding(2);
+            this.grpRegistry.Size = new System.Drawing.Size(453, 130);
+            this.grpRegistry.TabIndex = 5;
+            this.grpRegistry.TabStop = false;
+            this.grpRegistry.Text = "Registry — ClickOnce / SmartScreen (opsional)";
+            // 
+            // chkEnableClickOnceZone
+            // 
+            this.chkEnableClickOnceZone.AutoSize = true;
+            this.chkEnableClickOnceZone.Location = new System.Drawing.Point(9, 18);
+            this.chkEnableClickOnceZone.Margin = new System.Windows.Forms.Padding(2);
+            this.chkEnableClickOnceZone.Name = "chkEnableClickOnceZone";
+            this.chkEnableClickOnceZone.Size = new System.Drawing.Size(360, 17);
+            this.chkEnableClickOnceZone.TabIndex = 0;
+            this.chkEnableClickOnceZone.Text = "Izinkan pengecualian SmartScreen untuk server ClickOnce privat";
+            this.chkEnableClickOnceZone.UseVisualStyleBackColor = true;
+            this.chkEnableClickOnceZone.CheckedChanged += new System.EventHandler(this.ChkEnableClickOnceZone_CheckedChanged);
+            // 
+            // lblClickOnceZoneInfo
+            // 
+            this.lblClickOnceZoneInfo.Location = new System.Drawing.Point(9, 39);
+            this.lblClickOnceZoneInfo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblClickOnceZoneInfo.Name = "lblClickOnceZoneInfo";
+            this.lblClickOnceZoneInfo.Size = new System.Drawing.Size(435, 54);
+            this.lblClickOnceZoneInfo.TabIndex = 1;
+            this.lblClickOnceZoneInfo.Text = "Fungsi: update ClickOnce tanpa peringatan SmartScreen.\r\nRisiko: Windows lebih mempercayai server itu.\r\nHanya host privat/intranet yang diterima; host publik ditolak.\r\nDefault mati. Nyalakan hanya untuk server milik Anda.";
+            // 
+            // btnCleanupClickOnceZone
+            // 
+            this.btnCleanupClickOnceZone.Location = new System.Drawing.Point(9, 98);
+            this.btnCleanupClickOnceZone.Margin = new System.Windows.Forms.Padding(2);
+            this.btnCleanupClickOnceZone.Name = "btnCleanupClickOnceZone";
+            this.btnCleanupClickOnceZone.Size = new System.Drawing.Size(148, 23);
+            this.btnCleanupClickOnceZone.TabIndex = 2;
+            this.btnCleanupClickOnceZone.Text = "Bersihkan entri registry";
+            this.btnCleanupClickOnceZone.UseVisualStyleBackColor = true;
+            this.btnCleanupClickOnceZone.Click += new System.EventHandler(this.BtnCleanupClickOnceZone_Click);
+            // 
+            // lblClickOnceZoneStatus
+            // 
+            this.lblClickOnceZoneStatus.Location = new System.Drawing.Point(163, 102);
+            this.lblClickOnceZoneStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblClickOnceZoneStatus.Name = "lblClickOnceZoneStatus";
+            this.lblClickOnceZoneStatus.Size = new System.Drawing.Size(281, 18);
+            this.lblClickOnceZoneStatus.TabIndex = 3;
+            this.lblClickOnceZoneStatus.Text = "Nonaktif (default) — tidak menulis registry";
+            // 
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -984,6 +1047,8 @@ namespace TileKeeper
             this.tabSystem.ResumeLayout(false);
             this.grpResolution.ResumeLayout(false);
             this.grpResolution.PerformLayout();
+            this.grpRegistry.ResumeLayout(false);
+            this.grpRegistry.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1027,6 +1092,11 @@ private TileKeeper.ColoredCheckedListBox checkedScreen1;
         private System.Windows.Forms.GroupBox grpResolution;
         private System.Windows.Forms.Button btnAbout;
         private System.Windows.Forms.CheckBox chkEnableRes;
+        private System.Windows.Forms.GroupBox grpRegistry;
+        private System.Windows.Forms.CheckBox chkEnableClickOnceZone;
+        private System.Windows.Forms.Label lblClickOnceZoneInfo;
+        private System.Windows.Forms.Label lblClickOnceZoneStatus;
+        private System.Windows.Forms.Button btnCleanupClickOnceZone;
         private System.Windows.Forms.Label lblResWidth;
         private System.Windows.Forms.TextBox txtResWidth;
         private System.Windows.Forms.Label lblResHeight;

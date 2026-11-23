@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ProcessCommandLineCacheTests.cs" />
     <Compile Include="RdpLaunchTests.cs" />
+    <Compile Include="IntranetZoneHostTests.cs" />
     <Compile Include="WindowMonitorLayoutTests.cs" />
     <Compile Include="ScreenListRenderTests.cs" />
     <Compile Include="WindowMonitorMatchLargestTests.cs" />
