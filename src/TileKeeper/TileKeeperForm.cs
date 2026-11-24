@@ -73,6 +73,13 @@ namespace TileKeeper
         private readonly IWin32Api _win32Api = new Win32ApiImpl(); // reused by the watchdog for args-aware "is running" checks
 
         private bool _suppressingDedup;
+
+        /// <summary>
+        /// True while a list is being cleared/repopulated. The native ListView raises
+        /// ItemChecked from inside Items.Clear()/Items.Add(); re-entering RefreshLiveSnapshot
+        /// there can read half-built rows. The caller publishes one complete snapshot at end.
+        /// </summary>
+        private bool _suppressLiveSnapshotRefresh;
 // Per-screen (index-aligned with _screenChecklists): process names grayed out there.
         // Rebuilt wholesale by RecomputeDedupGrayed; never mutated incrementally.
         private readonly HashSet<string>[] _dedupGrayed;
@@ -737,14 +744,20 @@ namespace TileKeeper
         private const string MatchLargestOn  = "\u2611"; // ☑
         private const string MatchLargestOff = "\u2610"; // ☐
 
-        private static string RowName(ListViewItem item) =>
-            item.SubItems.Count > 1 ? item.SubItems[1].Text : item.Text;
+        // ItemChecked is raised by the native ListView while rows are being added or removed.
+        // During that re-entrant notification a row can still be in the collection with its
+        // subitems detached (or be null), so every helper must tolerate incomplete rows.
+        private static string RowName(ListViewItem item)
+        {
+            if (item == null) return "";
+            return item.SubItems.Count > 1 ? item.SubItems[1]?.Text ?? item.Text ?? "" : item.Text ?? "";
+        }
 
         private static string RowPath(ListViewItem item) =>
-            item.SubItems.Count > 2 ? item.SubItems[2].Text : "";
+            item != null && item.SubItems.Count > 2 ? item.SubItems[2]?.Text ?? "" : "";
 
         private static bool RowMatchLargest(ListViewItem item) =>
-            item.SubItems.Count > 2 && item.SubItems[2].Text == MatchLargestOn;
+            item != null && item.SubItems.Count > 2 && item.SubItems[2]?.Text == MatchLargestOn;
 
         private static ListViewItem NewProgramRow(string name, string path, bool enabled)
         {
@@ -772,23 +785,34 @@ namespace TileKeeper
         {
             var list = new List<ProgramEntry>();
             foreach (ListViewItem item in listPrograms.Items)
+            {
+                if (item == null) continue; // transient native row during Clear/Add
                 list.Add(new ProgramEntry(RowName(item), RowPath(item), enabled: item.Checked));
+            }
             AssignIdentityKeys(list);
             return list;
         }
 
         private void RebuildProgramList(List<ProgramEntry> entries)
         {
-            listPrograms.BeginUpdate();
+            _suppressLiveSnapshotRefresh = true;
             try
             {
-                listPrograms.Items.Clear();
-                foreach (var e in entries)
-                    listPrograms.Items.Add(NewProgramRow(e.Name, e.Path, e.Enabled));
+                listPrograms.BeginUpdate();
+                try
+                {
+                    listPrograms.Items.Clear();
+                    foreach (var e in entries)
+                        listPrograms.Items.Add(NewProgramRow(e.Name, e.Path, e.Enabled));
+                }
+                finally
+                {
+                    listPrograms.EndUpdate();
+                }
             }
             finally
             {
-                listPrograms.EndUpdate();
+                _suppressLiveSnapshotRefresh = false;
             }
         }
 
@@ -814,8 +838,11 @@ namespace TileKeeper
         {
             var list = new List<ProgramEntry>();
             foreach (ListViewItem item in listPositionPrograms.Items)
+            {
+                if (item == null) continue; // transient native row during Clear/Add
                 list.Add(new ProgramEntry(RowName(item), "", matchLargestWindow: RowMatchLargest(item),
                                           positionOnly: true, enabled: item.Checked));
+            }
             AssignIdentityKeys(list);
             return list;
         }
@@ -844,16 +871,24 @@ namespace TileKeeper
 
         private void RebuildPositionProgramList(List<ProgramEntry> entries)
         {
-            listPositionPrograms.BeginUpdate();
+            _suppressLiveSnapshotRefresh = true;
             try
             {
-                listPositionPrograms.Items.Clear();
-                foreach (var e in entries)
-                    listPositionPrograms.Items.Add(NewPositionRow(e.Name, e.MatchLargestWindow, e.Enabled));
+                listPositionPrograms.BeginUpdate();
+                try
+                {
+                    listPositionPrograms.Items.Clear();
+                    foreach (var e in entries)
+                        listPositionPrograms.Items.Add(NewPositionRow(e.Name, e.MatchLargestWindow, e.Enabled));
+                }
+                finally
+                {
+                    listPositionPrograms.EndUpdate();
+                }
             }
             finally
             {
-                listPositionPrograms.EndUpdate();
+                _suppressLiveSnapshotRefresh = false;
             }
         }
 
@@ -884,6 +919,11 @@ namespace TileKeeper
         /// </summary>
         private void RefreshLiveSnapshot()
         {
+            // Re-entrant ItemChecked notifications fire while a list is mid-rebuild.
+            // Ignore them; the rebuild's caller publishes the finished snapshot.
+            if (_suppressLiveSnapshotRefresh)
+                return;
+
             var programs = GetProgramEntries();
             var all = new List<ProgramEntry>(programs);
             all.AddRange(GetPositionEntries());
@@ -2396,6 +2436,8 @@ namespace TileKeeper
         /// </summary>
         private void ListPrograms_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
+            if (e?.Item == null)
+                return;
             if (e.Item.Checked)
                 e.Item.Selected = true;
             ApplyRowEnabledColor(e.Item);
@@ -2409,6 +2451,8 @@ namespace TileKeeper
         /// </summary>
         private void ListPositionPrograms_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
+            if (e?.Item == null)
+                return;
             if (e.Item.Checked)
                 e.Item.Selected = true;
             ApplyRowEnabledColor(e.Item);

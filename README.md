@@ -88,7 +88,16 @@ Semua gambar di bagian ini adalah **mock desain, bukan tangkapan layar asli dan 
 
 ## Unduh
 
-### v1.2.0 (terbaru)
+### v1.2.1 (terbaru)
+
+Perbaikan rilis ini:
+
+- Mengatasi `NullReferenceException` saat checkbox **Enable** di **Arrange Windows** dicentang/centang ulang. Baris yang sedang ditambahkan/dihapus tidak lagi dibaca saat snapshot live diperbarui.
+- Menghilangkan jalur yang bisa membuat aplikasi membuka proses pengganti berulang kali; sekarang hanya satu instance yang diizinkan dan perbaikan `app.config` dilakukan di proses yang sama.
+
+Rilis `v1.2.0` tetap tersedia sebagai riwayat, tetapi paket `v1.2.1` adalah yang disarankan.
+
+### v1.2.0
 
 | Berkas | Keterangan |
 |---|---|
