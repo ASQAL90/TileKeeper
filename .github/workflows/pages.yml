@@ -18,11 +18,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # Uploading in its own job gives the artifact time to become visible before
+  # deploy-pages lists it. In a single job the deploy step could query the
+  # artifact API in the same second as upload-pages-artifact finished and see
+  # "Found 0 artifact(s)", which failed the deployment.
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # actions/checkout@v7.0.1
 
@@ -32,5 +33,12 @@ jobs:
         with:
           path: site
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # actions/deploy-pages@v5.0.1
