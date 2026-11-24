@@ -181,6 +181,9 @@ namespace TileKeeper.Tests
         [Test]
         public void LiveForm_FullPipeline_CheckedRow_ShowsCellBadge()
         {
+            if (_liveConfigPath == null)
+                Assert.Ignore("live config not available");
+
             var form = new TileKeeperForm();
 
             var lists0 = (CheckedListBox[])GetField(form, "_screenChecklists");
@@ -364,7 +367,8 @@ namespace TileKeeper.Tests
 
             var rows = (System.Windows.Forms.ListView)GetField(form, "listPrograms");
             Assert.That(rows.Items.Count, Is.EqualTo(1), "dropped file must become one row");
-            Assert.That(rows.Items[0].Text, Is.EqualTo("FakeTool.exe"));
+            // Column 0 is the checkbox/header column; the program name lives in column 1.
+            Assert.That(rows.Items[0].SubItems[1].Text, Is.EqualTo("FakeTool.exe"));
         }
 
         /// <summary>
@@ -378,7 +382,7 @@ namespace TileKeeper.Tests
 
             var rows = (System.Windows.Forms.ListView)GetField(form, "listPositionPrograms");
             Assert.That(rows.Items.Count, Is.EqualTo(1), "dropped file must become one row");
-            Assert.That(rows.Items[0].Text, Is.EqualTo("FakeMon.exe"));
+            Assert.That(rows.Items[0].SubItems[1].Text, Is.EqualTo("FakeMon.exe"));
         }
 
         private static DragEventArgs initDragEventArgs(string fakePath)
