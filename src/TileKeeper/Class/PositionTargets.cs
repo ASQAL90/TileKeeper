@@ -17,8 +17,10 @@ namespace TileKeeper.Class
     /// </list>
     ///
     /// A position-only entry whose Enable box is off is never returned, whichever path
-    /// matched it. Launching entries keep their own Enable switch for the Keep Running
-    /// watchdog, so their flag deliberately does not affect positioning.
+    /// matched it. When a mirrored row exists in both lists (same identity key), the Arrange
+    /// row wins the match because its Enable box — not the Keep Running one — controls
+    /// positioning. Launching entries keep their own Enable switch for the watchdog, so their
+    /// flag deliberately does not affect positioning.
     /// </summary>
     public static class PositionTargets
     {
@@ -69,8 +71,15 @@ namespace TileKeeper.Class
                     if (entry == null)
                         continue;
 
-                    if (!string.IsNullOrWhiteSpace(entry.Key) && !byKey.ContainsKey(entry.Key))
-                        byKey[entry.Key] = entry;
+                    if (!string.IsNullOrWhiteSpace(entry.Key))
+                    {
+                        // A mirrored row exists in both lists under one identity key. The
+                        // Arrange row owns the positioning switch, so it must win the exact-key
+                        // slot even when the Keep Running twin was inserted first.
+                        if (!byKey.TryGetValue(entry.Key, out Entry existing)
+                            || (!existing.PositionOnly && entry.PositionOnly))
+                            byKey[entry.Key] = entry;
+                    }
 
                     if (string.IsNullOrWhiteSpace(entry.BaseName))
                         continue;
@@ -127,25 +136,36 @@ namespace TileKeeper.Class
                 if (byBase.TryGetValue(baseName, out List<Entry> candidates))
                 {
                     string wanted = args == "no args" ? "" : args;
+                    Entry launch = null;
                     foreach (var candidate in candidates)
-                        if (string.Equals(candidate.BaseArgs, wanted, StringComparison.OrdinalIgnoreCase))
-                            return candidate;
+                    {
+                        if (!string.Equals(candidate.BaseArgs, wanted, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        if (candidate.PositionOnly)
+                            return candidate; // the Arrange switch governs positioning
+                        if (launch == null)
+                            launch = candidate;
+                    }
+                    if (launch != null)
+                        return launch;
                 }
             }
 
             // Legacy config stored the bare process name while the list now carries args
-            // and therefore a disambiguated key. Prefer a usable entry over a disabled one.
+            // and therefore a disambiguated key. Prefer the Arrange row when one exists: its
+            // Enable box is the positioning switch, and a disabled one must not be bypassed
+            // by the mirrored Keep Running row.
             if (byBase.TryGetValue(key, out List<Entry> sameBase))
             {
-                Entry fallback = null;
+                Entry launch = null;
                 foreach (var candidate in sameBase)
                 {
-                    if (fallback == null)
-                        fallback = candidate;
-                    if (!candidate.PositionOnly || candidate.Enabled)
+                    if (candidate.PositionOnly)
                         return candidate;
+                    if (launch == null)
+                        launch = candidate;
                 }
-                return fallback;
+                return launch;
             }
 
             return null;

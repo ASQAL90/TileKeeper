@@ -102,6 +102,55 @@ namespace TileKeeper.Tests
         }
 
         [Test]
+        public void Resolve_MirroredRows_ArrangeSwitchStopsPositioning()
+        {
+            // Mirror-on-add gives both rows the same identity key. The Arrange row owns the
+            // positioning switch, so disabling it must win over the enabled Keep Running twin.
+            var entries = new List<PositionTargets.Entry>
+            {
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, false, true),
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, true, false),
+            };
+
+            var resolved = PositionTargets.Resolve(new[] { "viewer.exe (host:1)" }, entries);
+
+            Assert.That(resolved.Programs, Is.Empty);
+            Assert.That(resolved.KeptIndexes, Is.Empty);
+        }
+
+        [Test]
+        public void Resolve_MirroredRows_ArrangeSwitchEnablesPositioning()
+        {
+            // Disabling relaunch on the Keep Running row must not disturb positioning.
+            var entries = new List<PositionTargets.Entry>
+            {
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, false, false),
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", true, true, true),
+            };
+
+            var resolved = PositionTargets.Resolve(new[] { "viewer.exe (host:1)" }, entries);
+
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "viewer.exe" }));
+            Assert.That(resolved.MatchLargest, Is.EqualTo(new[] { true }),
+                "the Arrange row's Match largest setting applies");
+        }
+
+        [Test]
+        public void Resolve_LegacyKeyWithMirroredRows_UsesArrangeSwitch()
+        {
+            var entries = new List<PositionTargets.Entry>
+            {
+                Launch("viewer.exe", "host:1"),
+                Arrange("viewer.exe", "host:1", enabled: false),
+            };
+
+            var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
+
+            Assert.That(resolved.Programs, Is.Empty,
+                "a stale bare-name key must still honour the disabled Arrange row");
+        }
+
+        [Test]
         public void Resolve_DisabledArrangeRow_CannotSlipThroughLegacyMatch()
         {
             var entries = new List<PositionTargets.Entry>

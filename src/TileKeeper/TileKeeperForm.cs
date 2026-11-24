@@ -1133,12 +1133,19 @@ namespace TileKeeper
 
         private static int[] SlotsFromConfig(string csv, int count)
         {
-            if (string.IsNullOrWhiteSpace(csv))
-                return null;
-            var parts = csv.Split(',');
+            // Missing/empty slots mean "auto-fill": returning null here made the position loop
+            // dereference a null array for a screen whose ScreenNSlots key was never written.
             var arr = new int[count];
             for (int i = 0; i < count; i++)
-                arr[i] = (i < parts.Length && int.TryParse(parts[i].Trim(), out int v)) ? v : -1;
+                arr[i] = -1;
+
+            if (string.IsNullOrWhiteSpace(csv))
+                return arr;
+
+            var parts = csv.Split(',');
+            for (int i = 0; i < count; i++)
+                if (i < parts.Length && int.TryParse(parts[i].Trim(), out int v))
+                    arr[i] = v;
             return arr;
         }
 
