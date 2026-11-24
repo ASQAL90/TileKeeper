@@ -12,6 +12,7 @@ TileKeeper watches a list of programs you configure and does two things automati
 - **Arrange Windows** — moves a program's window back to the monitor and grid cell you assigned it.
 
 It lives in the system tray. Right-click the tray icon for **Show** (opens settings) and **Exit**
+(or double-click the icon to open the window).
 (this build has no exit password — Exit stops the program immediately). Closing the settings window
 with the X button minimizes it back to the tray — it does not stop the program.
 
@@ -31,18 +32,23 @@ update settings unchanged. Avoid it for everyday use.
 
 ## Keep Apps Running tab
 
-The list has three columns: **Enabled**, **Program**, and **Path / Command**. Column widths are
+The list has three columns: **Enabled (relaunch)**, **Program**, and **Path / Command**. Column widths are
 sized to fit the window without horizontal scrolling; the program name and path share the
 available space proportionally.
 
-- **Enabled** — uncheck a row to temporarily exclude that program from the watchdog. The row and
-  its path stay saved; re-check it to resume. This does **not** stop window positioning.
+- **Enabled (relaunch)** — uncheck a row to stop the watchdog relaunching it. The change applies on
+  the next scan, without Save; re-check it to resume. The row and its path stay saved, and an
+  application that is already open is not closed. This does **not** stop window positioning — the
+  Arrange Windows tab has its own switch.
 - **Add...** — opens a file picker (filtered to `.lnk`, `.appref-ms`, `.rdp`, `.vnc`, `.exe`). Pick a
-  shortcut or program file; you can multi-select. A `.vnc` connection file launches through
-  whichever VNC viewer Windows has associated with that extension (read from the file
+  shortcut or program file; you can multi-select. Adding a program here also adds a matching row to
+  the Arrange Windows list (its Enable box there is independent). A `.vnc` connection file launches
+  through whichever VNC viewer Windows has associated with that extension (read from the file
   association, same as double-clicking it in Explorer) — no separate setup needed.
-- **Edit...** — select a row, re-pick its file to change what it points to.
-- **Remove** — deletes the selected row(s).
+- **Remove** — deletes the selected row(s) and also removes those programs from every screen list.
+  The matching row in Arrange Windows is left in place, but its screen assignment is cleared too,
+  because a mirrored row shares one identity. To point a row at a different file, remove it
+  and add the new one.
 - **Up** / **Down** — reorders the selected row (matters for unpinned programs sharing a screen).
 - **Enable Keep Running** + **Cycle (seconds)** — turns on the relaunch watchdog and sets how often
   it checks (15–30s is reasonable).
@@ -62,16 +68,24 @@ that one; the other is left alone. The Arrange Windows tab shows both with a dis
 
 A second, separate list near the top of this tab. Programs added here are **not** launched or
 relaunched by Keep Running — use this for something you always start by hand but still want
-positioned correctly once open. Same Add / Edit / Remove buttons as the Keep Apps Running tab.
+positioned correctly once open. Programs added in Keep Apps Running appear here automatically, but
+after that the two lists are independent: each has its own Enable switch, and removing a row from
+one list does not remove it from the other.
 
-The list columns are **Enabled**, **Program**, and **Match largest**:
+The list columns are **Enabled (position)**, **Program**, and **Match largest**:
 
-- **Enabled** — uncheck a row to temporarily exclude that program from positioning. Its screen
-  assignment is preserved, so re-checking it resumes where it left off. This does **not** affect
-  the Keep Running watchdog.
+- **Enabled (position)** — uncheck a row to stop positioning it. The change applies on the next scan,
+  without Save; its screen assignment is preserved, so re-checking it resumes where it left off.
+  This does **not** affect the Keep Running watchdog.
+- **Remove** — deletes the selected row(s) and also removes those programs from every screen list.
+  The matching row in Keep Apps Running is left in place, but its screen assignment is cleared
+  too, because a mirrored row shares one identity.
 - **Match largest** — click the checkbox in this column to switch that program to picking its
   largest visible window (see Match Largest Window below). Checking a row's **Enabled** box also
-  selects it so Edit/Remove apply immediately.
+  selects it so Remove applies immediately.
+
+Enable toggles and Add/Remove apply live, so what the lists show is what TileKeeper acts on. Screen
+assignments (the checkboxes under Screen 1–4) take effect when you click `Save & Close`.
 
 Every program from *either* list (Keep Apps Running tab + this list) becomes available to check off in the
 four screen lists below.

@@ -109,13 +109,41 @@ namespace TileKeeper.Class
         /// </summary>
         public void SetModel(List<string> names, int[] slots, int rows, int cols)
         {
-            _names = names ?? new List<string>();
-            _slots = slots ?? new int[0];
+            var newNames = names ?? new List<string>();
+            var newSlots = slots ?? new int[0];
+
+            // RefreshAllGrids runs on every tray show and checkbox click. If the model is
+            // identical, keep the cached layout/GDI state and skip the repaint entirely.
+            if (_rows == rows && _cols == cols && SameNames(newNames) && SameSlots(newSlots))
+                return;
+
+            _names = newNames;
+            _slots = newSlots;
             _rows  = rows;
             _cols  = cols;
             _tooltipCell = null;
             RebuildLayout();
             Invalidate();
+        }
+
+        private bool SameNames(List<string> names)
+        {
+            if (_names.Count != names.Count)
+                return false;
+            for (int i = 0; i < names.Count; i++)
+                if (!string.Equals(_names[i], names[i], StringComparison.Ordinal))
+                    return false;
+            return true;
+        }
+
+        private bool SameSlots(int[] slots)
+        {
+            if (_slots.Length != slots.Length)
+                return false;
+            for (int i = 0; i < slots.Length; i++)
+                if (_slots[i] != slots[i])
+                    return false;
+            return true;
         }
 
         /// <summary>Recomputes the tile rects and the cell→program map from the current model.</summary>

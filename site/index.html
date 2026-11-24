@@ -50,7 +50,7 @@
 <body>
 <main class="wrap">
   <header>
-    <h1>TileKeeper<span class="tag">v1.1.0</span></h1>
+    <h1>TileKeeper<span class="tag">v1.2.0</span></h1>
     <p class="tagline">A Windows tray utility that keeps selected programs running and restores their windows to the monitors and grid cells you chose.</p>
     <div class="buttons">
       <a class="btn primary" href="https://github.com/asqal90/TileKeeper/releases/latest/download/TileKeeper-win.zip">Download for Windows</a>
@@ -60,12 +60,13 @@
   </header>
 
   <section>
-    <h2>What's new in v1.1.0<span class="tag">latest</span></h2>
+    <h2>What's new in v1.2.0<span class="tag">latest</span></h2>
     <ul>
-      <li>English UI: <strong>Keep Apps Running</strong>, <strong>Arrange Windows</strong>, <strong>Display &amp; Settings</strong>.</li>
-      <li>Per-app <strong>Enable</strong> checkboxes, independent for relaunching and window arranging.</li>
-      <li>A read-only update check that opens the GitHub release page; TileKeeper never replaces its own executable.</li>
-      <li>Configurable <strong>Process Protection</strong> (<code>EnableTerminateProtection</code>, default on).</li>
+      <li><strong>Enable</strong> changes apply on the next scan, with no Save needed. Running apps are not closed.</li>
+      <li>Adding an app in <strong>Keep Apps Running</strong> also adds it to <strong>Arrange Windows</strong>; after that the two lists are independent.</li>
+      <li><strong>Remove</strong> also clears the program from every screen list, so no stale entries remain.</li>
+      <li><strong>Edit</strong> was removed; point a row at a new file by removing it and adding the new one.</li>
+      <li>The Arrange Windows list shows about six rows, and a double-click on the tray icon opens the window instantly.</li>
     </ul>
   </section>
 
@@ -74,7 +75,7 @@
   <section>
     <h2>Screenshots</h2>
     <div class="shots">
-      <figure><img src="screenshot-programs.png" alt="Keep Apps Running tab"><figcaption>Keep Apps Running — the keep-alive list; per-app Enable, Add, Edit, Remove; 15s cycle.</figcaption></figure>
+      <figure><img src="screenshot-programs.png" alt="Keep Apps Running tab"><figcaption>Keep Apps Running — the keep-alive list; per-app Enable, Add and Remove; 15s cycle.</figcaption></figure>
       <figure><img src="screenshot-position.png" alt="Arrange Windows tab"><figcaption>Arrange Windows — assign programs to screens and 3&times;3 cells, per-app Enable, AutoFit, Borderless.</figcaption></figure>
       <figure><img src="screenshot-system.png" alt="Display & Settings tab"><figcaption>Display &amp; Settings — display resolution hold, update check, and Process Protection.</figcaption></figure>
       <figure><img src="screenshot-tray-menu.png" alt="Tray menu"><figcaption>Tray menu — Show, About, Exit.</figcaption></figure>
@@ -83,7 +84,7 @@
 
   <section>
     <h2>Adding programs</h2>
-    <p>Drag a file from Explorer and drop it straight onto either list. The other way is the <strong>Add&hellip;</strong> button, which opens a file picker and takes several files at once. <strong>Edit&hellip;</strong> points an existing row at a different file, <strong>Remove</strong> deletes it.</p>
+    <p>Drag a file from Explorer and drop it straight onto either list. The other way is the <strong>Add&hellip;</strong> button, which opens a file picker and takes several files at once. <strong>Remove</strong> deletes the row and also clears that program from every screen list; to change a row&rsquo;s file, remove it and add the new one.</p>
     <div class="shots">
       <figure><img src="screenshot-programs-annotated.png" alt="Keep Apps Running tab with the Add button and the drop area marked"><figcaption>Keep Apps Running &mdash; the apps to keep running.</figcaption></figure>
       <figure><img src="screenshot-position-annotated.png" alt="Arrange Windows tab with the same Add button and drop area marked"><figcaption>Arrange Windows &mdash; the same buttons and the same drop handling.</figcaption></figure>

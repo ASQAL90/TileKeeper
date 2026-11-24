@@ -108,6 +108,8 @@
     <Compile Include="Class\DisplayResolutionManager.cs" />
     <Compile Include="Class\WindowMonitor.cs" />
     <Compile Include="Class\ProgramEnableFlags.cs" />
+    <Compile Include="Class\LaunchTargets.cs" />
+    <Compile Include="Class\PositionTargets.cs" />
     <Compile Include="Class\UpdateChecker.cs" />
     <Compile Include="TileKeeperForm.cs">
       <SubType>Form</SubType>

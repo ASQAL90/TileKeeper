@@ -32,7 +32,6 @@ namespace TileKeeper
             this.tabPrograms = new System.Windows.Forms.TabPage();
             this.lblPgmHint = new System.Windows.Forms.Label();
             this.btnRemove = new System.Windows.Forms.Button();
-            this.btnEdit = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
             this.listPrograms = new System.Windows.Forms.ListView();
             this.txtCycle = new System.Windows.Forms.TextBox();
@@ -46,7 +45,6 @@ namespace TileKeeper
             this.grpPositionList = new System.Windows.Forms.GroupBox();
             this.listPositionPrograms = new System.Windows.Forms.ListView();
             this.btnAddPosition = new System.Windows.Forms.Button();
-            this.btnEditPosition = new System.Windows.Forms.Button();
             this.btnRemovePosition = new System.Windows.Forms.Button();
             this.grpScreen1 = new System.Windows.Forms.GroupBox();
             this.checkedScreen1 = new TileKeeper.ColoredCheckedListBox();
@@ -138,7 +136,6 @@ namespace TileKeeper
             // 
             this.tabPrograms.Controls.Add(this.lblPgmHint);
             this.tabPrograms.Controls.Add(this.btnRemove);
-            this.tabPrograms.Controls.Add(this.btnEdit);
             this.tabPrograms.Controls.Add(this.btnAdd);
             this.tabPrograms.Controls.Add(this.listPrograms);
             this.tabPrograms.Controls.Add(this.txtCycle);
@@ -167,7 +164,7 @@ namespace TileKeeper
             // 
             this.btnRemove.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(181)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.btnRemove.ForeColor = System.Drawing.Color.White;
-            this.btnRemove.Location = new System.Drawing.Point(137, 512);
+            this.btnRemove.Location = new System.Drawing.Point(78, 512);
             this.btnRemove.Margin = new System.Windows.Forms.Padding(2);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(62, 23);
@@ -175,19 +172,6 @@ namespace TileKeeper
             this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = false;
             this.btnRemove.Click += new System.EventHandler(this.BtnRemove_Click);
-            // 
-            // btnEdit
-            // 
-            this.btnEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(87)))), ((int)(((byte)(184)))));
-            this.btnEdit.ForeColor = System.Drawing.Color.White;
-            this.btnEdit.Location = new System.Drawing.Point(78, 512);
-            this.btnEdit.Margin = new System.Windows.Forms.Padding(2);
-            this.btnEdit.Name = "btnEdit";
-            this.btnEdit.Size = new System.Drawing.Size(54, 23);
-            this.btnEdit.TabIndex = 5;
-            this.btnEdit.Text = "Edit...";
-            this.btnEdit.UseVisualStyleBackColor = false;
-            this.btnEdit.Click += new System.EventHandler(this.BtnEdit_Click);
             // 
             // btnAdd
             // 
@@ -308,13 +292,12 @@ namespace TileKeeper
             // 
             this.grpPositionList.Controls.Add(this.listPositionPrograms);
             this.grpPositionList.Controls.Add(this.btnAddPosition);
-            this.grpPositionList.Controls.Add(this.btnEditPosition);
             this.grpPositionList.Controls.Add(this.btnRemovePosition);
             this.grpPositionList.Location = new System.Drawing.Point(9, 34);
             this.grpPositionList.Margin = new System.Windows.Forms.Padding(2);
             this.grpPositionList.Name = "grpPositionList";
             this.grpPositionList.Padding = new System.Windows.Forms.Padding(2);
-            this.grpPositionList.Size = new System.Drawing.Size(453, 130);
+            this.grpPositionList.Size = new System.Drawing.Size(453, 175);
             this.grpPositionList.TabIndex = 3;
             this.grpPositionList.TabStop = false;
             this.grpPositionList.Text = "Programs to Position (added here are not launched by Keep Running)";
@@ -327,7 +310,7 @@ namespace TileKeeper
             this.listPositionPrograms.Location = new System.Drawing.Point(9, 16);
             this.listPositionPrograms.Margin = new System.Windows.Forms.Padding(2);
             this.listPositionPrograms.Name = "listPositionPrograms";
-            this.listPositionPrograms.Size = new System.Drawing.Size(435, 78);
+            this.listPositionPrograms.Size = new System.Drawing.Size(435, 123);
             this.listPositionPrograms.TabIndex = 0;
             this.listPositionPrograms.UseCompatibleStateImageBehavior = false;
             this.listPositionPrograms.View = System.Windows.Forms.View.Details;
@@ -336,7 +319,7 @@ namespace TileKeeper
             // 
             this.btnAddPosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(87)))), ((int)(((byte)(184)))));
             this.btnAddPosition.ForeColor = System.Drawing.Color.White;
-            this.btnAddPosition.Location = new System.Drawing.Point(9, 100);
+            this.btnAddPosition.Location = new System.Drawing.Point(9, 145);
             this.btnAddPosition.Margin = new System.Windows.Forms.Padding(2);
             this.btnAddPosition.Name = "btnAddPosition";
             this.btnAddPosition.Size = new System.Drawing.Size(60, 23);
@@ -345,24 +328,11 @@ namespace TileKeeper
             this.btnAddPosition.UseVisualStyleBackColor = false;
             this.btnAddPosition.Click += new System.EventHandler(this.BtnAddPosition_Click);
             // 
-            // btnEditPosition
-            // 
-            this.btnEditPosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(87)))), ((int)(((byte)(184)))));
-            this.btnEditPosition.ForeColor = System.Drawing.Color.White;
-            this.btnEditPosition.Location = new System.Drawing.Point(73, 100);
-            this.btnEditPosition.Margin = new System.Windows.Forms.Padding(2);
-            this.btnEditPosition.Name = "btnEditPosition";
-            this.btnEditPosition.Size = new System.Drawing.Size(52, 23);
-            this.btnEditPosition.TabIndex = 2;
-            this.btnEditPosition.Text = "Edit...";
-            this.btnEditPosition.UseVisualStyleBackColor = false;
-            this.btnEditPosition.Click += new System.EventHandler(this.BtnEditPosition_Click);
-            // 
             // btnRemovePosition
             // 
             this.btnRemovePosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(181)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.btnRemovePosition.ForeColor = System.Drawing.Color.White;
-            this.btnRemovePosition.Location = new System.Drawing.Point(129, 100);
+            this.btnRemovePosition.Location = new System.Drawing.Point(73, 145);
             this.btnRemovePosition.Margin = new System.Windows.Forms.Padding(2);
             this.btnRemovePosition.Name = "btnRemovePosition";
             this.btnRemovePosition.Size = new System.Drawing.Size(62, 23);
@@ -381,11 +351,11 @@ namespace TileKeeper
             this.grpScreen1.Controls.Add(this.chkAutoFit1);
             this.grpScreen1.Controls.Add(this.chkBorderless1);
             this.grpScreen1.Controls.Add(this.gridMap1);
-            this.grpScreen1.Location = new System.Drawing.Point(9, 168);
+            this.grpScreen1.Location = new System.Drawing.Point(9, 213);
             this.grpScreen1.Margin = new System.Windows.Forms.Padding(2);
             this.grpScreen1.Name = "grpScreen1";
             this.grpScreen1.Padding = new System.Windows.Forms.Padding(2);
-            this.grpScreen1.Size = new System.Drawing.Size(222, 186);
+            this.grpScreen1.Size = new System.Drawing.Size(222, 164);
             this.grpScreen1.TabIndex = 4;
             this.grpScreen1.TabStop = false;
             this.grpScreen1.Text = "Screen 1";
@@ -398,7 +368,7 @@ namespace TileKeeper
             this.checkedScreen1.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen1.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen1.Name = "checkedScreen1";
-            this.checkedScreen1.Size = new System.Drawing.Size(120, 154);
+            this.checkedScreen1.Size = new System.Drawing.Size(120, 132);
             this.checkedScreen1.TabIndex = 4;
             // 
             // lblGridRows1
@@ -469,7 +439,7 @@ namespace TileKeeper
             // gridMap1
             // 
             this.gridMap1.BackColor = System.Drawing.SystemColors.Control;
-            this.gridMap1.Location = new System.Drawing.Point(130, 106);
+            this.gridMap1.Location = new System.Drawing.Point(130, 88);
             this.gridMap1.Margin = new System.Windows.Forms.Padding(2);
             this.gridMap1.Name = "gridMap1";
             this.gridMap1.Size = new System.Drawing.Size(86, 66);
@@ -487,11 +457,11 @@ namespace TileKeeper
             this.grpScreen2.Controls.Add(this.chkAutoFit2);
             this.grpScreen2.Controls.Add(this.chkBorderless2);
             this.grpScreen2.Controls.Add(this.gridMap2);
-            this.grpScreen2.Location = new System.Drawing.Point(235, 168);
+            this.grpScreen2.Location = new System.Drawing.Point(235, 213);
             this.grpScreen2.Margin = new System.Windows.Forms.Padding(2);
             this.grpScreen2.Name = "grpScreen2";
             this.grpScreen2.Padding = new System.Windows.Forms.Padding(2);
-            this.grpScreen2.Size = new System.Drawing.Size(222, 186);
+            this.grpScreen2.Size = new System.Drawing.Size(222, 164);
             this.grpScreen2.TabIndex = 5;
             this.grpScreen2.TabStop = false;
             this.grpScreen2.Text = "Screen 2";
@@ -504,7 +474,7 @@ namespace TileKeeper
             this.checkedScreen2.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen2.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen2.Name = "checkedScreen2";
-            this.checkedScreen2.Size = new System.Drawing.Size(120, 154);
+            this.checkedScreen2.Size = new System.Drawing.Size(120, 132);
             this.checkedScreen2.TabIndex = 4;
             // 
             // lblGridRows2
@@ -575,7 +545,7 @@ namespace TileKeeper
             // gridMap2
             // 
             this.gridMap2.BackColor = System.Drawing.SystemColors.Control;
-            this.gridMap2.Location = new System.Drawing.Point(130, 106);
+            this.gridMap2.Location = new System.Drawing.Point(130, 88);
             this.gridMap2.Margin = new System.Windows.Forms.Padding(2);
             this.gridMap2.Name = "gridMap2";
             this.gridMap2.Size = new System.Drawing.Size(86, 66);
@@ -593,11 +563,11 @@ namespace TileKeeper
             this.grpScreen3.Controls.Add(this.chkAutoFit3);
             this.grpScreen3.Controls.Add(this.chkBorderless3);
             this.grpScreen3.Controls.Add(this.gridMap3);
-            this.grpScreen3.Location = new System.Drawing.Point(9, 356);
+            this.grpScreen3.Location = new System.Drawing.Point(9, 379);
             this.grpScreen3.Margin = new System.Windows.Forms.Padding(2);
             this.grpScreen3.Name = "grpScreen3";
             this.grpScreen3.Padding = new System.Windows.Forms.Padding(2);
-            this.grpScreen3.Size = new System.Drawing.Size(222, 186);
+            this.grpScreen3.Size = new System.Drawing.Size(222, 164);
             this.grpScreen3.TabIndex = 6;
             this.grpScreen3.TabStop = false;
             this.grpScreen3.Text = "Screen 3";
@@ -610,7 +580,7 @@ namespace TileKeeper
             this.checkedScreen3.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen3.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen3.Name = "checkedScreen3";
-            this.checkedScreen3.Size = new System.Drawing.Size(120, 154);
+            this.checkedScreen3.Size = new System.Drawing.Size(120, 132);
             this.checkedScreen3.TabIndex = 4;
             // 
             // lblGridRows3
@@ -681,7 +651,7 @@ namespace TileKeeper
             // gridMap3
             // 
             this.gridMap3.BackColor = System.Drawing.SystemColors.Control;
-            this.gridMap3.Location = new System.Drawing.Point(130, 106);
+            this.gridMap3.Location = new System.Drawing.Point(130, 88);
             this.gridMap3.Margin = new System.Windows.Forms.Padding(2);
             this.gridMap3.Name = "gridMap3";
             this.gridMap3.Size = new System.Drawing.Size(86, 66);
@@ -699,11 +669,11 @@ namespace TileKeeper
             this.grpScreen4.Controls.Add(this.chkAutoFit4);
             this.grpScreen4.Controls.Add(this.chkBorderless4);
             this.grpScreen4.Controls.Add(this.gridMap4);
-            this.grpScreen4.Location = new System.Drawing.Point(235, 356);
+            this.grpScreen4.Location = new System.Drawing.Point(235, 379);
             this.grpScreen4.Margin = new System.Windows.Forms.Padding(2);
             this.grpScreen4.Name = "grpScreen4";
             this.grpScreen4.Padding = new System.Windows.Forms.Padding(2);
-            this.grpScreen4.Size = new System.Drawing.Size(222, 186);
+            this.grpScreen4.Size = new System.Drawing.Size(222, 164);
             this.grpScreen4.TabIndex = 7;
             this.grpScreen4.TabStop = false;
             this.grpScreen4.Text = "Screen 4";
@@ -716,7 +686,7 @@ namespace TileKeeper
             this.checkedScreen4.Location = new System.Drawing.Point(6, 18);
             this.checkedScreen4.Margin = new System.Windows.Forms.Padding(2);
             this.checkedScreen4.Name = "checkedScreen4";
-            this.checkedScreen4.Size = new System.Drawing.Size(120, 154);
+            this.checkedScreen4.Size = new System.Drawing.Size(120, 132);
             this.checkedScreen4.TabIndex = 4;
             // 
             // lblGridRows4
@@ -787,7 +757,7 @@ namespace TileKeeper
             // gridMap4
             // 
             this.gridMap4.BackColor = System.Drawing.SystemColors.Control;
-            this.gridMap4.Location = new System.Drawing.Point(130, 106);
+            this.gridMap4.Location = new System.Drawing.Point(130, 88);
             this.gridMap4.Margin = new System.Windows.Forms.Padding(2);
             this.gridMap4.Name = "gridMap4";
             this.gridMap4.Size = new System.Drawing.Size(86, 66);
@@ -1098,8 +1068,7 @@ namespace TileKeeper
         private System.Windows.Forms.TabPage tabSystem;
         private System.Windows.Forms.ListView listPrograms;
         private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.Button btnEdit;
-private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Label lblPgmHint;
         private System.Windows.Forms.CheckBox chkEnablePersist;
         private System.Windows.Forms.TextBox txtCycle;
@@ -1164,8 +1133,7 @@ private TileKeeper.ColoredCheckedListBox checkedScreen3;
         private System.Windows.Forms.GroupBox grpPositionList;
         private System.Windows.Forms.ListView listPositionPrograms;
         private System.Windows.Forms.Button btnAddPosition;
-        private System.Windows.Forms.Button btnEditPosition;
-private System.Windows.Forms.Button btnRemovePosition;
+        private System.Windows.Forms.Button btnRemovePosition;
         private System.Windows.Forms.GroupBox grpScreen1;
         private System.Windows.Forms.GroupBox grpScreen2;
         private System.Windows.Forms.GroupBox grpScreen3;

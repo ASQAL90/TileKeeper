@@ -45,6 +45,23 @@ namespace TileKeeper
         private bool running = true; // Set to false on exit to stop all background threads cleanly
 
         /// <summary>
+        /// Live snapshot of the Keep Apps Running rows, published by the UI thread after every
+        /// edit and read by the relaunch loop. The Enable checkbox therefore takes effect on the
+        /// next cycle without Save — the list on screen is what actually runs.
+        /// </summary>
+        private List<ProgramEntry> _livePrograms;
+
+        /// <summary>Live snapshot of both lists combined (identity keys resolved), used by the position keeper.</summary>
+        private List<ProgramEntry> _livePositionable;
+
+        /// <summary>
+        /// Last-write stamp of the exe.config captured after a load/save. OnShow only rebuilds the
+        /// form when the file changed underneath us (external edit); an ordinary hide/show keeps
+        /// unsaved rows and toggles intact and paints in one pass.
+        /// </summary>
+        private DateTime _configStampUtc = DateTime.MinValue;
+
+        /// <summary>
         /// Manual grid-cell pins, keyed by process name (case-insensitive).
         /// Value = zero-based cell index; absence or -1 = auto-fill in list order.
         /// </summary>
@@ -109,19 +126,22 @@ namespace TileKeeper
             // Widths are kept inside the 451px list so no horizontal scrolling is needed.
             listPrograms.View = View.Details;
             listPrograms.CheckBoxes = true;
-            listPrograms.Columns.Add("Enabled", 62);
-            listPrograms.Columns.Add("Program", 165);
-            listPrograms.Columns.Add("Path / Command", 222);
+            listPrograms.Columns.Add("Enabled (relaunch)", 100);
+            listPrograms.Columns.Add("Program", 150);
+            listPrograms.Columns.Add("Path / Command", 199);
             listPrograms.FullRowSelect = true;
+            // Checking a box does not select a row on its own (same reason as the Arrange
+            // list below), so sync check -> select and refresh the gray state/live snapshot.
+            listPrograms.ItemChecked += ListPrograms_ItemChecked;
 
             // Position-only list. Its native checkbox is the per-row Enable switch for
             // positioning; Match Largest Window moved to an explicit clickable column so
             // the two switches can never be confused.
             listPositionPrograms.View = View.Details;
             listPositionPrograms.CheckBoxes = true;
-            listPositionPrograms.Columns.Add("Enabled", 62);
-            listPositionPrograms.Columns.Add("Program", 225);
-            listPositionPrograms.Columns.Add("Match largest", 145);
+            listPositionPrograms.Columns.Add("Enabled (position)", 100);
+            listPositionPrograms.Columns.Add("Program", 205);
+            listPositionPrograms.Columns.Add("Match largest", 144);
             listPositionPrograms.FullRowSelect = true;
             // Checking a row's box (Checked) and selecting it (Selected/blue highlight, what
             // Edit/Remove/Up/Down require) are independent WinForms ListView states — checking
@@ -178,7 +198,9 @@ namespace TileKeeper
                 Icon             = Icon.ExtractAssociatedIcon(Application.ExecutablePath),
                 ContextMenuStrip = trayMenu
             };
-            trayIcon.MouseClick += TrayIcon_MouseClick;
+            // Right-click menu is supplied by ContextMenuStrip; a left double-click opens the
+            // window (the OS does not do this for NotifyIcon on its own).
+            trayIcon.DoubleClick += OnShow;
 
             // Start minimised and hidden from the taskbar — app lives in the tray
             this.WindowState    = FormWindowState.Minimized;
@@ -475,6 +497,9 @@ namespace TileKeeper
 
             RebuildProgramList(LoadEntriesFromConfig());
             RebuildPositionProgramList(LoadPositionEntriesFromConfig());
+            // Publish the freshly loaded rows before the screen lists are rebuilt — dedup and
+            // grid badges resolve args from this snapshot, not from the config file.
+            RefreshLiveSnapshot();
 
             // Load process-persistence settings
             txtCycle.Text   = GetConfigValue("CycleSeconds", "15");
@@ -556,6 +581,7 @@ namespace TileKeeper
             keepScreenPosTimer = int.Parse(txtCycleScreen.Text) * 1000;
 
             RefreshAllGrids();
+            RememberConfigStamp();
         }
 
         /// <summary>
@@ -720,11 +746,26 @@ namespace TileKeeper
         private static bool RowMatchLargest(ListViewItem item) =>
             item.SubItems.Count > 2 && item.SubItems[2].Text == MatchLargestOn;
 
-        private static ListViewItem NewProgramRow(string name, string path, bool enabled) =>
-            new ListViewItem(new[] { "", name, path }) { Checked = enabled };
+        private static ListViewItem NewProgramRow(string name, string path, bool enabled)
+        {
+            var item = new ListViewItem(new[] { "", name, path }) { Checked = enabled };
+            ApplyRowEnabledColor(item);
+            return item;
+        }
 
-        private static ListViewItem NewPositionRow(string name, bool matchLargest, bool enabled) =>
-            new ListViewItem(new[] { "", name, matchLargest ? MatchLargestOn : MatchLargestOff }) { Checked = enabled };
+        private static ListViewItem NewPositionRow(string name, bool matchLargest, bool enabled)
+        {
+            var item = new ListViewItem(new[] { "", name, matchLargest ? MatchLargestOn : MatchLargestOff })
+                { Checked = enabled };
+            ApplyRowEnabledColor(item);
+            return item;
+        }
+
+        /// <summary>Enabled rows render normally; a disabled row is grayed in both lists.</summary>
+        private static void ApplyRowEnabledColor(ListViewItem item)
+        {
+            item.ForeColor = item.Checked ? SystemColors.WindowText : SystemColors.GrayText;
+        }
 
         /// <summary>Builds the program entries currently shown in the ListView.</summary>
         private List<ProgramEntry> GetProgramEntries()
@@ -836,6 +877,29 @@ namespace TileKeeper
             return all;
         }
 
+        /// <summary>
+        /// Republishes the UI snapshots the background loops read. Called after every list
+        /// mutation (load, add, remove, reorder, check/uncheck) and after Save, so the loops see
+        /// exactly what the form shows — no Save required, no stale index left behind.
+        /// </summary>
+        private void RefreshLiveSnapshot()
+        {
+            var programs = GetProgramEntries();
+            var all = new List<ProgramEntry>(programs);
+            all.AddRange(GetPositionEntries());
+            AssignIdentityKeys(all);
+
+            Volatile.Write(ref _livePrograms, programs);
+            Volatile.Write(ref _livePositionable, all);
+        }
+
+        /// <summary>
+        /// Entries the position keeper should use: the live snapshot once the form has built its
+        /// lists, otherwise (very early startup) the saved config.
+        /// </summary>
+        private List<ProgramEntry> CurrentPositionableEntries() =>
+            Volatile.Read(ref _livePositionable) ?? LoadAllPositionableEntriesFromConfig();
+
         // ─────────────────────────────────────────────────────────────────────
         // Screen assignment model (checked list + grid slots)
         // ─────────────────────────────────────────────────────────────────────
@@ -878,6 +942,91 @@ namespace TileKeeper
             }
             RecomputeDedupGrayed();
             RefreshAllGrids();
+        }
+
+        /// <summary>Slots dictionary for screen index 0..3.</summary>
+        private Dictionary<string, int> ScreenSlotsFor(int index)
+        {
+            switch (index)
+            {
+                case 0: return _screenSlot1;
+                case 1: return _screenSlot2;
+                case 2: return _screenSlot3;
+                default: return _screenSlot4;
+            }
+        }
+
+        /// <summary>
+        /// Removes the screen assignments that belonged to <paramref name="removed"/> from every
+        /// checklist and pin map, then writes ScreenN/ScreenNSlots through to config. Matching is
+        /// by identity, not just the current key: legacy config may still hold the bare process
+        /// name (before args were split out) or the "BaseName (args)" shape. The write-through is
+        /// deliberate — <see cref="BuildCandidates"/> merges "names that only exist in config"
+        /// back into the checklists, so an in-memory-only removal would be resurrected.
+        ///
+        /// The look-alike row in the other program list is left in place. Because a mirrored row
+        /// shares the same identity key, the screen assignment is shared too: removing either
+        /// copy clears it for both.
+        /// </summary>
+        private void ExpungeFromScreens(IEnumerable<ProgramEntry> removed, IList<ProgramEntry> allEntries)
+        {
+            var removedList = new List<ProgramEntry>();
+            var removedSet = new HashSet<ProgramEntry>(removed ?? new ProgramEntry[0]);
+            foreach (var entry in removedSet)
+                if (entry != null)
+                    removedList.Add(entry);
+            if (removedList.Count == 0)
+                return;
+
+            var remaining = new List<ProgramEntry>();
+            if (allEntries != null)
+                foreach (var entry in allEntries)
+                    if (entry != null && !removedSet.Contains(entry))
+                        remaining.Add(entry);
+
+            bool MatchesRemoved(string item)
+            {
+                foreach (var entry in removedList)
+                {
+                    if (string.Equals(item, entry.Key, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    string formatted = $"{entry.BaseName} ({(entry.BaseArgs.Length > 0 ? entry.BaseArgs : "no args")})";
+                    if (string.Equals(item, formatted, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    // A bare process-name key is unambiguous only when no other row shares it.
+                    if (string.Equals(item, entry.BaseName, StringComparison.OrdinalIgnoreCase)
+                        && !remaining.Exists(r => string.Equals(r.BaseName, entry.BaseName, StringComparison.OrdinalIgnoreCase)))
+                        return true;
+                }
+                return false;
+            }
+
+            for (int s = 0; s < _screenChecklists.Length; s++)
+            {
+                CheckedListBox chk = _screenChecklists[s];
+                var dropped = new List<string>();
+                for (int i = chk.Items.Count - 1; i >= 0; i--)
+                {
+                    string item = chk.Items[i].ToString();
+                    if (!MatchesRemoved(item))
+                        continue;
+                    dropped.Add(item);
+                    chk.Items.RemoveAt(i);
+                }
+
+                Dictionary<string, int> slots = ScreenSlotsFor(s);
+                foreach (string item in dropped)
+                    slots.Remove(item);
+
+                List<string> remainingNames = GetCheckedNamesInClickOrder(chk);
+                SaveSettings("Screen" + (s + 1), string.Join(",", remainingNames));
+                SaveSettings("Screen" + (s + 1) + "Slots", SaveScreenSlots(remainingNames, slots));
+            }
+
+            // Our own write must not look like an external edit when the form is reopened.
+            RememberConfigStamp();
         }
 
         private void PopulateScreen(CheckedListBox chk, List<string> candidates, ISet<string> checkedSet)
@@ -1347,38 +1496,48 @@ namespace TileKeeper
             {
                 try
                 {
-                    // Re-read config every cycle so changes saved while running take effect immediately
-                    string[] programName = GetConfigValue("ProgramName", "").Split(',');
-                    string[] programPath = SplitProgramPaths(GetConfigValue("ProgramPath", ""));
+                    // Read the live UI snapshot the form publishes after every edit. It wins over
+                    // the config file, so an un-saved Enable toggle (or Add/Remove) changes what
+                    // runs on this cycle; Save only makes it permanent.
+                    List<ProgramEntry> snapshot = Volatile.Read(ref _livePrograms);
+                    var rows = new List<LaunchTargets.Entry>();
+                    if (snapshot != null)
+                    {
+                        foreach (var e in snapshot)
+                            rows.Add(new LaunchTargets.Entry(e.Name, e.Path, e.Enabled));
+                    }
+                    else
+                    {
+                        // Very early startup, before the form built its lists.
+                        string[] names = GetConfigValue("ProgramName", "").Split(',');
+                        string[] paths = SplitProgramPaths(GetConfigValue("ProgramPath", ""));
+                        bool[] enabled = ProgramEnableFlags.Parse(
+                            GetConfigValue("ProgramEnabled", ""), names.Length);
+                        for (int i = 0; i < names.Length && i < paths.Length; i++)
+                            rows.Add(new LaunchTargets.Entry(names[i], paths[i], enabled[i]));
+                    }
 
                     bool.TryParse(ConfigurationManager.AppSettings["EnablePersistRun"], out bool enablePersistRun);
                     bool.TryParse(ConfigurationManager.AppSettings["EnableMonitoring"],   out bool enableMonitoring);
 
-                    bool[] programEnabled = ProgramEnableFlags.Parse(
-                        GetConfigValue("ProgramEnabled", ""), programName.Length);
-
-                    if (enablePersistRun && programName.Length > 0 && programPath.Length > 0)
+                    if (enablePersistRun)
                     {
                         var tasks = new List<Task>();
 
-                        for (int i = 0; i < programName.Length; i++)
+                        foreach (var target in LaunchTargets.Filter(rows))
                         {
-                            int index = i; // Capture loop variable for the async lambda
+                            string programName = target.Name;
+                            string programPath = target.Path;
 
                             tasks.Add(Task.Run(async () =>
                             {
                                 try
                                 {
-                                    // A disabled row is temporarily excluded from relaunching.
-                                    // Its config entry stays intact, so re-checking Enable resumes it.
-                                    if (!programEnabled[index] || index >= programPath.Length)
-                                        return;
-
-                                    string fullProgramPath = BuildFullPath(programName[index], programPath[index]);
+                                    string fullProgramPath = BuildFullPath(programName, programPath);
                                     if (string.IsNullOrEmpty(fullProgramPath))
                                         return;
 
-                                    ParseNameParts(programName[index], out string baseName, out string baseArgs);
+                                    ParseNameParts(programName, out string baseName, out string baseArgs);
                                     Process[] runningProcs = Process.GetProcessesByName(baseName);
 
                                     bool isRunning = string.IsNullOrEmpty(baseArgs)
@@ -1408,7 +1567,8 @@ namespace TileKeeper
                             }));
                         }
 
-                        await Task.WhenAll(tasks);
+                        if (tasks.Count > 0)
+                            await Task.WhenAll(tasks);
                     }
                 }
                 catch (Exception ex)
@@ -1505,10 +1665,17 @@ namespace TileKeeper
         /// <summary>Looks up a checked screen-list Key's configured args ("" when none/unmatched).</summary>
         private string ArgsForKey(string key)
         {
-            foreach (var e in LoadAllPositionableEntriesFromConfig())
+            string fallback = null;
+            foreach (var e in CurrentPositionableEntries())
+            {
                 if (string.Equals(e.Key, key, StringComparison.OrdinalIgnoreCase))
                     return e.BaseArgs;
-            return "";
+                // Legacy config stored the bare process name (or the item is a stale key);
+                // remember the first matching BaseName so identity comparisons still work.
+                if (fallback == null && string.Equals(e.BaseName, key, StringComparison.OrdinalIgnoreCase))
+                    fallback = e.BaseArgs;
+            }
+            return fallback ?? "";
         }
 
         /// <summary>
@@ -1520,9 +1687,15 @@ namespace TileKeeper
         private Dictionary<string, string> BuildKeyArgsLookup()
         {
             var byKey = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var e in LoadAllPositionableEntriesFromConfig())
+            foreach (var e in CurrentPositionableEntries())
+            {
                 if (!string.IsNullOrWhiteSpace(e.Key) && !byKey.ContainsKey(e.Key))
                     byKey[e.Key] = e.BaseArgs;
+                // Alias the bare process name so a screen list written by an older version
+                // resolves to the same args for the dedup/gray passes.
+                if (!string.IsNullOrWhiteSpace(e.BaseName) && !byKey.ContainsKey(e.BaseName))
+                    byKey[e.BaseName] = e.BaseArgs;
+            }
             return byKey;
         }
 
@@ -1541,38 +1714,17 @@ namespace TileKeeper
         private void ResolveScreenPrograms(List<string> keys, out List<string> programs, out List<string> args,
                                            out List<bool> matchLargest, out List<int> keptIndexes)
         {
-            var byKey = new Dictionary<string, ProgramEntry>(StringComparer.OrdinalIgnoreCase);
-            foreach (var e in LoadAllPositionableEntriesFromConfig())
+            var entries = new List<PositionTargets.Entry>();
+            foreach (var e in CurrentPositionableEntries())
                 if (!string.IsNullOrWhiteSpace(e.Key))
-                    byKey[e.Key] = e;
+                    entries.Add(new PositionTargets.Entry(
+                        e.Key, e.BaseName, e.BaseArgs, e.MatchLargestWindow, e.PositionOnly, e.Enabled));
 
-            programs = new List<string>();
-            args = new List<string>();
-            matchLargest = new List<bool>();
-            keptIndexes = new List<int>();
-            for (int i = 0; i < keys.Count; i++)
-            {
-                string k = keys[i];
-
-                // The Position tab's Enable checkbox only affects position-only rows.
-                // Launch entries keep their own Enable switch for the Keep Running watchdog.
-                if (byKey.TryGetValue(k, out ProgramEntry e) && e.PositionOnly && !e.Enabled)
-                    continue;
-
-                keptIndexes.Add(i);
-                if (e != null)
-                {
-                    programs.Add(e.BaseName);
-                    args.Add(e.BaseArgs);
-                    matchLargest.Add(e.MatchLargestWindow);
-                }
-                else
-                {
-                    programs.Add(k);
-                    args.Add("");
-                    matchLargest.Add(false);
-                }
-            }
+            var resolved = PositionTargets.Resolve(keys, entries);
+            programs = resolved.Programs;
+            args = resolved.Args;
+            matchLargest = resolved.MatchLargest;
+            keptIndexes = resolved.KeptIndexes;
         }
 
         /// <summary>
@@ -2103,6 +2255,12 @@ namespace TileKeeper
                 }
             }
 
+            // The saved values are now the config of record. Republish the snapshot the
+            // background loops read, and record the file stamp so reopening from the tray
+            // shows this form as-is instead of rebuilding it from disk.
+            RefreshLiveSnapshot();
+            RememberConfigStamp();
+
             MessageBox.Show("Settings saved successfully!", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close(); // Triggers OnFormClosing → minimises to tray
         }
@@ -2148,49 +2306,34 @@ namespace TileKeeper
                     AddProgramRowFromFile(fullPath);
             }          
 
+            RefreshLiveSnapshot();
             RebuildScreenCandidates();
         }
 
-        /// <summary>Re-picks the file backing the selected row (one program).</summary>
-        private void BtnEdit_Click(object sender, EventArgs e)
-        {
-            if (listPrograms.SelectedItems.Count == 0)
-            {
-                MessageBox.Show("Select a program row to edit.", "Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            var item = listPrograms.SelectedItems[0];
-
-            using (var dlg = NewProgramDialog())
-            {
-                if (dlg.ShowDialog() != DialogResult.OK)
-                    return;
-
-                string fullPath = dlg.FileName;
-                var (name, path) = ResolveProgramFile(fullPath);
-                if (IsSelf(name))
-                {
-                    MessageBox.Show("This program cannot add itself to the list.", "Edit",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                if (ListContainsName(listPrograms, name, item))
-                    return; // silent — renaming onto an existing row is skipped like Add
-
-                item.SubItems[1].Text = name;
-                item.SubItems[2].Text = path;
-            }
-
-            RebuildScreenCandidates();
-        }
-
-        /// <summary>Removes the selected program rows.</summary>
+        /// <summary>Removes the selected program rows and their screen assignments.</summary>
         private void BtnRemove_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in listPrograms.SelectedItems.Cast<ListViewItem>().ToList())
-                listPrograms.Items.Remove(item);
+            var selected = listPrograms.SelectedItems.Cast<ListViewItem>().ToList();
+            if (selected.Count == 0)
+                return;
 
+            // Resolve identity keys while the rows still exist in the list, then cascade the
+            // removal into the four screen checklists. The row in Arrange Windows is left
+            // alone — the two lists only share rows when one was added from Keep Running.
+            var combined = GetAllPositionableEntries();
+            var removedEntries = new List<ProgramEntry>();
+            foreach (ListViewItem item in selected)
+            {
+                string name = RowName(item);
+                var entry = combined.FirstOrDefault(
+                    x => !x.PositionOnly && string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+                if (entry != null)
+                    removedEntries.Add(entry);
+                listPrograms.Items.Remove(item);
+            }
+
+            ExpungeFromScreens(removedEntries, combined);
+            RefreshLiveSnapshot();
             RebuildScreenCandidates();
         }
 
@@ -2211,58 +2354,58 @@ namespace TileKeeper
                     AddPositionRowFromFile(fullPath);
             }
             
+            RefreshLiveSnapshot();
             RebuildScreenCandidates();
         }
 
-        /// <summary>Re-picks the file backing the selected position-only row.</summary>
-        private void BtnEditPosition_Click(object sender, EventArgs e)
-        {
-            if (listPositionPrograms.SelectedItems.Count == 0)
-            {
-                MessageBox.Show("Select a program row to edit.", "Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            var item = listPositionPrograms.SelectedItems[0];
-
-            using (var dlg = NewProgramDialog())
-            {
-                if (dlg.ShowDialog() != DialogResult.OK)
-                    return;
-
-                var (name, _) = ResolveProgramFile(dlg.FileName);
-                if (IsSelf(name))
-                {
-                    MessageBox.Show("This program cannot add itself to the list.", "Edit",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                if (ListContainsName(listPositionPrograms, name, item))
-                    return; // silent — renaming onto an existing row is skipped like Add
-
-                item.SubItems[1].Text = name;
-            }
-
-            RebuildScreenCandidates();
-        }
-
-        /// <summary>Removes the selected position-only rows.</summary>
+        /// <summary>Removes the selected position-only rows and their screen assignments.</summary>
         private void BtnRemovePosition_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in listPositionPrograms.SelectedItems.Cast<ListViewItem>().ToList())
-                listPositionPrograms.Items.Remove(item);
+            var selected = listPositionPrograms.SelectedItems.Cast<ListViewItem>().ToList();
+            if (selected.Count == 0)
+                return;
 
+            var combined = GetAllPositionableEntries();
+            var removedEntries = new List<ProgramEntry>();
+            foreach (ListViewItem item in selected)
+            {
+                string name = RowName(item);
+                var entry = combined.FirstOrDefault(
+                    x => x.PositionOnly && string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+                if (entry != null)
+                    removedEntries.Add(entry);
+                listPositionPrograms.Items.Remove(item);
+            }
+
+            ExpungeFromScreens(removedEntries, combined);
+            RefreshLiveSnapshot();
             RebuildScreenCandidates();
         }
 
         /// <summary>
-        /// Selects a row when its Enable checkbox is checked, so Edit/Remove act on that row
-        /// without an extra click. Only checking selects — unchecking leaves selection alone.
+        /// Selects a row when its Enable checkbox is checked, so Remove acts on that row
+        /// without an extra click, and repaints the row's disabled state. Only checking
+        /// selects — unchecking leaves selection alone.
+        /// </summary>
+        private void ListPrograms_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (e.Item.Checked)
+                e.Item.Selected = true;
+            ApplyRowEnabledColor(e.Item);
+            RefreshLiveSnapshot();
+        }
+
+        /// <summary>
+        /// Selects a row when its Enable checkbox is checked, so Remove acts on that row
+        /// without an extra click, and repaints the row's disabled state. Only checking
+        /// selects — unchecking leaves selection alone.
         /// </summary>
         private void ListPositionPrograms_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             if (e.Item.Checked)
                 e.Item.Selected = true;
+            ApplyRowEnabledColor(e.Item);
+            RefreshLiveSnapshot();
         }
 
         /// <summary>Clicking the Match-largest column flips its checkbox glyph, not the Enable box.</summary>
@@ -2292,7 +2435,7 @@ namespace TileKeeper
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            if (ListContainsName(listPositionPrograms, name, null))
+            if (ListContainsName(listPositionPrograms, name))
                 return false;
 
             listPositionPrograms.Items.Add(NewPositionRow(name, false, true));
@@ -2301,13 +2444,12 @@ namespace TileKeeper
 
         /// <summary>
         /// Case-insensitive search for <paramref name="name"/> among <paramref name="list"/>'s row
-        /// text (the row's identity — see AddProgramRowFromFile). <paramref name="ignore"/> excludes
-        /// the row being edited so renaming a row onto itself isn't flagged as a duplicate.
+        /// text (the row's identity — see AddProgramRowFromFile).
         /// </summary>
-        private static bool ListContainsName(ListView list, string name, ListViewItem ignore)
+        private static bool ListContainsName(ListView list, string name)
         {
             foreach (ListViewItem item in list.Items)
-                if (item != ignore && string.Equals(RowName(item), name, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(RowName(item), name, StringComparison.OrdinalIgnoreCase))
                     return true;
             return false;
         }
@@ -2326,6 +2468,7 @@ namespace TileKeeper
             foreach (string fullPath in files)
                 AddProgramRowFromFile(fullPath);
 
+            RefreshLiveSnapshot();
             RebuildScreenCandidates();
         }
 
@@ -2337,6 +2480,7 @@ namespace TileKeeper
             foreach (string fullPath in files)
                 AddPositionRowFromFile(fullPath);
 
+            RefreshLiveSnapshot();
             RebuildScreenCandidates();
         }        
 
@@ -2374,10 +2518,18 @@ namespace TileKeeper
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            if (ListContainsName(listPrograms, name, null))
+            if (ListContainsName(listPrograms, name))
                 return false;
 
             listPrograms.Items.Add(NewProgramRow(name, path, true));
+
+            // The first Add in Keep Apps Running also makes the program available under
+            // Arrange Windows. Its Enable box there is a separate switch; if the name already
+            // exists in Arrange its current state is left untouched, and later edits/removals
+            // on either list are independent.
+            if (!ListContainsName(listPositionPrograms, name))
+                listPositionPrograms.Items.Add(NewPositionRow(name, false, true));
+
             return true;
         }
 
@@ -2547,17 +2699,71 @@ namespace TileKeeper
         // Tray icon and window behaviour
         // ─────────────────────────────────────────────────────────────────────
 
+        /// <summary>Path of the exe.config this process loaded.</summary>
+        private static string ConfigFilePath()
+        {
+            try { return AppDomain.CurrentDomain.SetupInformation.ConfigurationFile; }
+            catch { return null; }
+        }
+
+        /// <summary>Records the config file's last-write time after our own load or save.</summary>
+        private void RememberConfigStamp()
+        {
+            string path = ConfigFilePath();
+            try
+            {
+                _configStampUtc = path != null && File.Exists(path)
+                    ? File.GetLastWriteTimeUtc(path)
+                    : DateTime.MinValue;
+            }
+            catch
+            {
+                _configStampUtc = DateTime.MinValue;
+            }
+        }
+
+        /// <summary>True when an external edit changed the config after our last load/save.</summary>
+        private bool ConfigChangedSinceLoad()
+        {
+            string path = ConfigFilePath();
+            if (path == null)
+                return false;
+
+            try
+            {
+                if (!File.Exists(path))
+                    return true;
+                return File.GetLastWriteTimeUtc(path) != _configStampUtc;
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
         /// <summary>
-        /// Shows the settings form (called from the tray "Show" menu item).
-        /// Re-initialises all controls from config.
+        /// Shows the settings form (called from the tray icon's double-click and the
+        /// "Show" menu item). Rebuilds the controls only when the config file changed
+        /// underneath us; an ordinary hide/show keeps unsaved edits and shows instantly.
         /// </summary>
         protected void OnShow(object sender, EventArgs e)
         {
-            InitializeOrReload();
-            this.Show();
-            this.WindowState  = FormWindowState.Normal;
-            originalSize      = this.Size;
+            // Decide before any paint: a reload in front of the window is the slow redraw.
+            bool needsReload = ConfigChangedSinceLoad();
+
+            // Change the state before showing. Flipping Minimized → Normal *after* Show()
+            // made Windows lay the form out and paint it twice.
+            if (this.WindowState == FormWindowState.Minimized)
+                this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
+            this.Show();
+            this.Activate();
+            originalSize = this.Size;
+
+            // Rebuild only after the window is visible, and only for a real external edit.
+            // Unsaved rows and toggles therefore survive a trip to the tray.
+            if (needsReload)
+                BeginInvoke(new Action(InitializeOrReload));
         }
 
         /// <summary>
@@ -2641,14 +2847,8 @@ namespace TileKeeper
             txtGridRows2.Text = txtGridCols2.Text = "0";
             txtGridRows3.Text = txtGridCols3.Text = "0";
             txtGridRows4.Text = txtGridCols4.Text = "0";
+            RefreshLiveSnapshot();
             RefreshAllGrids();
-        }
-
-        /// <summary>Shows the context menu on right-click; left-click is handled by the OS default (show window).</summary>
-        private void TrayIcon_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-                trayMenu.Show(Cursor.Position);
         }
 
         /// <summary>Prevents non-digit characters from being typed into numeric input fields.</summary>
