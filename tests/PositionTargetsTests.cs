@@ -138,10 +138,12 @@ namespace TileKeeper.Tests
         [Test]
         public void Resolve_LegacyKeyWithMirroredRows_UsesArrangeSwitch()
         {
+            // Both rows already carry the current identity key; only the stored config key
+            // is old (bare process name). The disabled Arrange row must still win.
             var entries = new List<PositionTargets.Entry>
             {
-                Launch("viewer.exe", "host:1"),
-                Arrange("viewer.exe", "host:1", enabled: false),
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, false, true),
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, true, false),
             };
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
@@ -177,6 +179,24 @@ namespace TileKeeper.Tests
 
             Assert.That(resolved.Programs, Is.EqualTo(new[] { "notepad.exe" }),
                 "Enable on a Keep Running row only controls relaunch, never positioning");
+        }
+
+        [Test]
+        public void Resolve_BareKeyMatchingLaunchRow_IsNotHijackedByArrangeRow()
+        {
+            // A launch row with no args has the bare name as its identity key. That exact
+            // match is a different identity from "viewer.exe (host:1)", so it keeps its own
+            // (launch-row) positioning even when the args-carrying Arrange row is disabled.
+            var entries = new List<PositionTargets.Entry>
+            {
+                new PositionTargets.Entry("viewer.exe", "viewer.exe", "", false, false, false),
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, true, false),
+            };
+
+            var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
+
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "viewer.exe" }));
+            Assert.That(resolved.Args, Is.EqualTo(new[] { "" }));
         }
 
         [Test]
