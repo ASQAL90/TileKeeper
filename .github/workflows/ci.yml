@@ -28,14 +28,16 @@ jobs:
         shell: pwsh
         run: |
           $version = '3.17.0'
-          $zip = Join-Path $env:RUNNER_TEMP "NUnit.Console-$version.zip"
+          # The nunit-console GitHub release does not ship a NUnit.Console-<ver>.zip asset;
+          # the NuGet package is the supported distribution and contains tools\nunit3-console.exe.
+          $zip = Join-Path $env:RUNNER_TEMP "nunit.consolerunner.$version.zip"
           $out = Join-Path $env:RUNNER_TEMP 'nunit-console'
           Invoke-WebRequest -UseBasicParsing `
-            -Uri "https://github.com/nunit/nunit-console/releases/download/v$version/NUnit.Console-$version.zip" `
+            -Uri "https://www.nuget.org/api/v2/package/NUnit.ConsoleRunner/$version" `
             -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath $out -Force
-          & (Join-Path $out 'nunit3-console.exe') 'tests\bin\Release\TileKeeper.Tests.dll' `
-            --result=TestResult.xml --noheader --labels=Before
+          & (Join-Path $out 'tools\nunit3-console.exe') 'tests\bin\Release\TileKeeper.Tests.dll' `
+            --result=TestResult.xml --labels=Before
           if ($LASTEXITCODE -ne 0) {
             throw "Test gagal (exit code $LASTEXITCODE)."
           }
