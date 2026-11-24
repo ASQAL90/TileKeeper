@@ -59,7 +59,7 @@ Dua sesi VNC ke server yang sama? Buat dua shortcut dengan argumen berbeda, tamb
 
 ## Menambah program
 
-Ada dua cara: seret file dari Explorer langsung ke daftar (tab **Keep Apps Running** atau **Arrange Windows**), atau klik **Add…** lalu pilih filenya — bisa beberapa sekaligus. **Edit…** mengganti file pada baris yang sudah ada, **Remove** menghapusnya.
+Ada dua cara: seret file dari Explorer langsung ke daftar (tab **Keep Apps Running** atau **Arrange Windows**), atau klik **Add…** lalu pilih filenya — bisa beberapa sekaligus. **Remove** menghapus baris dan sekaligus membersihkan program itu dari daftar screen. Untuk mengganti file pada sebuah baris, hapus lalu tambahkan yang baru. Menambahkan di **Keep Apps Running** juga menambah baris yang sama di **Arrange Windows**; setelah itu Enable dan Remove di kedua daftar berjalan sendiri-sendiri.
 
 ![Tombol Add dan area drop](site/screenshot-programs-annotated.png)
 
@@ -88,14 +88,23 @@ Semua gambar di bagian ini adalah **mock desain, bukan tangkapan layar asli dan 
 
 ## Unduh
 
-### v1.1.0 (terbaru)
+### v1.2.0 (terbaru)
 
 | Berkas | Keterangan |
 |---|---|
 | [TileKeeper-win.zip](https://github.com/ASQAL90/TileKeeper/releases/latest/download/TileKeeper-win.zip) | `TileKeeper.exe` + `TileKeeper.exe.config`, tanpa installer |
 | [SHA256SUMS.txt](https://github.com/ASQAL90/TileKeeper/releases/latest/download/SHA256SUMS.txt) | Checksum SHA-256 |
 
-Perubahan utama v1.1.0:
+Perubahan utama v1.2.0:
+
+- Checkbox **Enable** langsung berlaku di siklus berikutnya, tanpa perlu Save. Aplikasi yang sedang berjalan tidak ikut ditutup.
+- Menambah program di **Keep Apps Running** otomatis menambah baris yang sama di **Arrange Windows**. Setelah itu Enable/Remove kedua daftar independen.
+- **Remove** ikut menghapus program dari keempat daftar screen, jadi tidak ada entri yatim yang tersisa.
+- Tombol **Edit** dihapus; ganti target dengan Remove lalu Add.
+- Daftar **Arrange Windows** menampilkan sekitar enam baris tanpa memperbesar jendela.
+- Klik dua kali ikon tray membuka jendela, dan jendela muncul tanpa reload atau redraw.
+
+### v1.1.0
 
 - Checkbox **Enable** terpisah untuk **Keep Apps Running** dan **Arrange Windows**.
 - Tombol **Check for updates** dan **Open release page** di tab **Display & Settings**.

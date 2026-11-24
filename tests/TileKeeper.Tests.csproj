@@ -47,6 +47,8 @@
     <Compile Include="ScreenListRenderTests.cs" />
     <Compile Include="WindowMonitorMatchLargestTests.cs" />
     <Compile Include="UpdateAndEnableFlagsTests.cs" />
+    <Compile Include="PositionTargetsTests.cs" />
+    <Compile Include="LaunchTargetsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\TileKeeper\TileKeeper.csproj">
