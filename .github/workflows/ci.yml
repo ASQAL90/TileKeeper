@@ -21,3 +21,31 @@ jobs:
 
       - name: Build proyek test
         run: msbuild tests/TileKeeper.Tests.csproj /p:Configuration=Release /p:Platform=AnyCPU /m
+
+      # The test project targets .NET Framework 4.8 with a vendored NUnit 3 framework,
+      # so the NUnit 3 console runner is used instead of `dotnet test`.
+      - name: Jalankan test (NUnit console)
+        shell: pwsh
+        run: |
+          $version = '3.17.0'
+          # The nunit-console GitHub release does not ship a NUnit.Console-<ver>.zip asset;
+          # the NuGet package is the supported distribution and contains tools\nunit3-console.exe.
+          $zip = Join-Path $env:RUNNER_TEMP "nunit.consolerunner.$version.zip"
+          $out = Join-Path $env:RUNNER_TEMP 'nunit-console'
+          Invoke-WebRequest -UseBasicParsing `
+            -Uri "https://www.nuget.org/api/v2/package/NUnit.ConsoleRunner/$version" `
+            -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath $out -Force
+          & (Join-Path $out 'tools\nunit3-console.exe') 'tests\bin\Release\TileKeeper.Tests.dll' `
+            --result=TestResult.xml --labels=Before --inprocess
+          if ($LASTEXITCODE -ne 0) {
+            throw "Test gagal (exit code $LASTEXITCODE)."
+          }
+
+      - name: Upload hasil test
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # actions/upload-artifact@v7.0.2
+        with:
+          name: nunit-results
+          path: TestResult.xml
+          if-no-files-found: ignore
