@@ -2719,8 +2719,8 @@ namespace TileKeeper
             string path = ConfigFilePath();
             try
             {
-                _configStampUtc = path != null && File.Exists(path)
-                    ? File.GetLastWriteTimeUtc(path)
+                _configStampUtc = path != null && System.IO.File.Exists(path)
+                    ? System.IO.File.GetLastWriteTimeUtc(path)
                     : DateTime.MinValue;
             }
             catch
@@ -2738,9 +2738,9 @@ namespace TileKeeper
 
             try
             {
-                if (!File.Exists(path))
+                if (!System.IO.File.Exists(path))
                     return true;
-                return File.GetLastWriteTimeUtc(path) != _configStampUtc;
+                return System.IO.File.GetLastWriteTimeUtc(path) != _configStampUtc;
             }
             catch
             {
