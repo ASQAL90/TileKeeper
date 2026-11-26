@@ -50,6 +50,10 @@ jobs:
           $version = "${{ github.ref_name }}".TrimStart('v')
           $path = "docs/release-notes/$version.md"
           if (!(Test-Path $path)) { throw "Missing release notes: $path" }
+          $text = Get-Content $path -Raw
+          if ($text -notmatch '(?m)^## (Fitur baru|Perbaikan bug|Peningkatan keamanan|Catatan)' -or $text -notmatch '(?m)^- ') {
+            throw "Release notes $path do not contain a recognized section and bullet."
+          }
           "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Publish GitHub release
