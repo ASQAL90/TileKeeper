@@ -12,13 +12,13 @@
 - Ada peringatan Save / Don't Save / Cancel kalau jendela ditutup ke tray saat masih ada perubahan yang belum disimpan.
 - Resolusi layar yang ditampilkan memakai piksel fisik, bukan ukuran yang sudah diskalakan.
 - Watchdog mengenali aplikasi yang sudah berjalan sebelum TileKeeper dibuka, termasuk aplikasi ClickOnce, sehingga tidak menjalankannya berulang-ulang.
-- Klik dua kali ikon tray cukup sekali untuk membuka jendela, tanpa berkedip atau jendela yang hanya tampil sebagian.
+- Cukup satu double-click pada ikon tray untuk membuka jendela penuh, tanpa berkedip atau klik tambahan.
 - Nomor sel tidak lagi bergeser saat baris di-uncheck. Baris lain tetap di selnya, dan baris yang di-uncheck menyisakan sel kosong.
 - Aplikasi lain tidak lagi melebar mengisi sel milik baris yang di-uncheck.
 - Mengklik checkbox tidak lagi mengubah checkbox baris lain yang sedang dipilih untuk Remove.
 - Perubahan pin sel dan tombol Rows/Cols langsung terlihat di preview grid.
 - Monitor yang tidak terdeteksi menonaktifkan kontrolnya, tetapi tata letak yang tersimpan tidak hilang saat monitor disambung lagi.
-- Jendela yang dibuka dari tray tampil penuh dengan sekali klik, tanpa perlu klik kedua.
+- Jendela yang dibuka dari tray tampil penuh setelah satu double-click, tanpa perlu klik kedua.
 
 ## v1.1.0
 - Checkbox Enable untuk setiap aplikasi, terpisah antara daftar Keep Apps Running dan Arrange Windows.
