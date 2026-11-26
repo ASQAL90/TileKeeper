@@ -132,6 +132,37 @@ namespace TileKeeper.Class
         }
 
         /// <summary>
+        /// Reads the primary display's current mode in <b>physical pixels</b> from the
+        /// display driver instead of WinForms' DPI-virtualized <c>Screen.Bounds</c>.
+        /// At 125% scaling on a 1920×1200 panel this returns 1920×1200, not 1536×960.
+        /// </summary>
+        public bool TryGetPrimaryMode(out int width, out int height)
+        {
+            width = 0;
+            height = 0;
+
+            List<DisplayState> states = GetCurrentStates();
+            DisplayState primary = null;
+            foreach (DisplayState state in states)
+            {
+                if (state.Bounds.X == 0 && state.Bounds.Y == 0)
+                {
+                    primary = state;
+                    break;
+                }
+            }
+            if (primary == null && states.Count > 0)
+                primary = states[0];
+
+            if (primary == null || primary.Width <= 0 || primary.Height <= 0)
+                return false;
+
+            width = primary.Width;
+            height = primary.Height;
+            return true;
+        }
+
+        /// <summary>
         /// Clamps every attached display whose current resolution exceeds
         /// <paramref name="maxWidth"/>×<paramref name="maxHeight"/> down to the largest
         /// advertised mode that fits inside the cap. Returns how many displays were changed.

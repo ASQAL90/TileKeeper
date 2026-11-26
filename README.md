@@ -73,6 +73,8 @@ Ada dua cara: seret file dari Explorer langsung ke daftar (tab **Keep Apps Runni
 
 File yang sama tidak ditambahkan dua kali. Dua shortcut ke program yang sama dengan argumen berbeda tetap jadi dua baris, jadi dua host VNC atau dua tampilan SCADA punya posisi sendiri-sendiri. TileKeeper tidak bisa menambahkan dirinya sendiri.
 
+File teks, dokumen, gambar, atau video belum bisa dijalankan ulang pada v1.2.2 — walaupun bisa dipilih lewat **All Files**. Rencana dukungan asosiasi file dan batasannya ada di [`docs/SUPPORTED-FILES.md`](docs/SUPPORTED-FILES.md).
+
 ## Contoh tata letak
 
 Ilustrasi satu layar monitor dengan jumlah aplikasi berbeda: production counter, SCADA, quality, server dan network monitoring, CCTV, dan daftar alarm.
@@ -88,14 +90,29 @@ Semua gambar di bagian ini adalah **mock desain, bukan tangkapan layar asli dan 
 
 ## Unduh
 
-### v1.2.1 (terbaru)
+### v1.2.2 (terbaru)
+
+Perbaikan dan penyesuaian rilis ini:
+
+- **X di title bar** kembali menyembunyikan jendela ke systray (tanpa mengubah `ShowInTaskbar` saat jendela dibuka).
+- Form sekarang **fixed size** — tidak bisa di-resize atau dimaksimalkan.
+- Daftar **Screen 1–4** diperpanjang sampai bawahnya sejajar dengan **grid map**; grid map juga tidak lagi menimpa checkbox **Borderless**.
+- Di tab **Display & Settings**, tombol **About** dipindah ke kanan bawah dan **Process Protection** mengambil posisinya yang lama.
+- Tombol **Reset Programs & Layout** sekarang menampilkan peringatan konfirmasi (default **No**), lalu menghapus dan mengembalikan seluruh `app.config` ke nilai awal secara permanen — termasuk cadangan di `%AppData%\TileKeeper\`.
+- Checkbox **Enable** pada baris Arrange dan checkbox **ScreenN** langsung berlaku di siklus berikutnya tanpa Save.
+- **Identitas baris sekarang stabil**: setiap program mendapat ID persisten di `app.config`, dan `Screen1`–`Screen4` serta pin grid menyimpan ID tersebut, bukan nama/argumen yang berubah saat ada duplikat. Remove menghapus tepat satu ID; entri saudara yang nama/argumennya sama tidak ikut terhapus atau muncul sebagai duplikat. Config lama otomatis dimigrasikan sekali saat aplikasi dibuka, dengan cadangan dibuat lebih dulu.
+- Mengurangi kedip saat membuka jendela dari tray: `Screen.AllScreens` di-cache, save config dilakukan sekali, dan rebuild daftar dibungkus penekanan repaint.
+
+Rilis `v1.2.1` tetap tersedia sebagai riwayat.
+
+### v1.2.1
 
 Perbaikan rilis ini:
 
 - Mengatasi `NullReferenceException` saat checkbox **Enable** di **Arrange Windows** dicentang/centang ulang. Baris yang sedang ditambahkan/dihapus tidak lagi dibaca saat snapshot live diperbarui.
 - Menghilangkan jalur yang bisa membuat aplikasi membuka proses pengganti berulang kali; sekarang hanya satu instance yang diizinkan dan perbaikan `app.config` dilakukan di proses yang sama.
 
-Rilis `v1.2.0` tetap tersedia sebagai riwayat, tetapi paket `v1.2.1` adalah yang disarankan.
+Rilis `v1.2.0` dan `v1.2.1` tetap tersedia sebagai riwayat, tetapi paket `v1.2.2` adalah yang disarankan.
 
 ### v1.2.0
 

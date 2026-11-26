@@ -47,6 +47,11 @@ namespace TileKeeper.Class
         private static readonly SolidBrush[] EmptyBrushes;
         private static readonly Pen[]         CellPens;
         private static readonly Color[]       EmptyTextColors;
+        private static readonly SolidBrush    UnassignedBrush =
+            new SolidBrush(Color.FromArgb(0xE8, 0xE8, 0xE8));
+        private static readonly Pen           UnassignedPen =
+            new Pen(SystemColors.ControlDark);
+        private static readonly Color         UnassignedText = Color.DimGray;
 
         static GridMapPanel()
         {
@@ -77,13 +82,17 @@ namespace TileKeeper.Class
         }
 
         private List<string> _names = new List<string>();
+        private List<string> _displayNames = new List<string>();
         private int[]        _slots = new int[0];
         private int          _rows;
         private int          _cols;
+        private int          _reservedCells;
+        private int[]        _emptyCells = new int[0];
 
         // Derived from (_names, _slots, _rows, _cols) — rebuilt only in SetModel, never per paint.
         private WindowMonitor.CellRect[] _layout = new WindowMonitor.CellRect[0];
         private string[]                 _cellProgram = new string[0];
+        private string[]                 _cellDisplay = new string[0];
 
         private Font _labelFont;
 
@@ -105,25 +114,47 @@ namespace TileKeeper.Class
         /// <summary>
         /// Reloads the data model. <paramref name="names"/> is the ordered program list for
         /// this screen, <paramref name="slots"/> the parallel slot array (-1 = auto-fill),
-        /// and <paramref name="rows"/>/<paramref name="cols"/> the grid shape (0 = auto).
+        /// <paramref name="rows"/>/<paramref name="cols"/> the grid shape (0 = auto), and
+        /// <paramref name="reservedCells"/> the highest pinned cell + 1 (pins of unchecked
+        /// rows included) so an auto grid keeps its shape when a row is unchecked.
+        /// <paramref name="emptyCells"/> are cells cleared by the user: they remain in the
+        /// shape but are never auto-filled by another program.
         /// </summary>
-        public void SetModel(List<string> names, int[] slots, int rows, int cols)
+        public void SetModel(List<string> names, int[] slots, int rows, int cols, int reservedCells = 0,
+                             int[] emptyCells = null, List<string> displayNames = null)
         {
             var newNames = names ?? new List<string>();
             var newSlots = slots ?? new int[0];
+            var newEmpty = emptyCells ?? new int[0];
+            var newDisplay = displayNames ?? new List<string>();
 
             // RefreshAllGrids runs on every tray show and checkbox click. If the model is
             // identical, keep the cached layout/GDI state and skip the repaint entirely.
-            if (_rows == rows && _cols == cols && SameNames(newNames) && SameSlots(newSlots))
+            if (_rows == rows && _cols == cols && _reservedCells == reservedCells
+                && SameNames(newNames) && SameSlots(newSlots) && SameInts(_emptyCells, newEmpty)
+                && SameDisplayNames(newDisplay))
                 return;
 
             _names = newNames;
+            _displayNames = newDisplay;
             _slots = newSlots;
             _rows  = rows;
             _cols  = cols;
+            _reservedCells = reservedCells;
+            _emptyCells = newEmpty;
             _tooltipCell = null;
             RebuildLayout();
             Invalidate();
+        }
+
+        private static bool SameInts(int[] a, int[] b)
+        {
+            if (a.Length != b.Length)
+                return false;
+            for (int i = 0; i < a.Length; i++)
+                if (a[i] != b[i])
+                    return false;
+            return true;
         }
 
         private bool SameNames(List<string> names)
@@ -132,6 +163,16 @@ namespace TileKeeper.Class
                 return false;
             for (int i = 0; i < names.Count; i++)
                 if (!string.Equals(_names[i], names[i], StringComparison.Ordinal))
+                    return false;
+            return true;
+        }
+
+        private bool SameDisplayNames(List<string> names)
+        {
+            if (_displayNames.Count != names.Count)
+                return false;
+            for (int i = 0; i < names.Count; i++)
+                if (!string.Equals(_displayNames[i], names[i], StringComparison.Ordinal))
                     return false;
             return true;
         }
@@ -150,22 +191,62 @@ namespace TileKeeper.Class
         private void RebuildLayout()
         {
             _cellProgram = new string[0];
+            _cellDisplay = new string[0];
 
             if (_names.Count == 0)
             {
-                _layout = new WindowMonitor.CellRect[0];
+                // An explicit rows×cols shape (or the reserved cells of a previously sized
+                // auto grid) still defines the grid even before any program is mapped. Show
+                // every cell as gray/clickable so a row from this screen's list can be assigned
+                // straight into one of them.
+                if (_rows > 0 && _cols > 0)
+                {
+                    _layout = new WindowMonitor.CellRect[_rows * _cols];
+                    double w = 1.0 / _cols;
+                    double h = 1.0 / _rows;
+                    for (int r = 0; r < _rows; r++)
+                        for (int c = 0; c < _cols; c++)
+                            _layout[r * _cols + c] =
+                                new WindowMonitor.CellRect(c * w, r * h, w, h);
+                    _cellProgram = new string[_layout.Length];
+                    _cellDisplay = new string[_layout.Length];
+                }
+                else if (_reservedCells > 0)
+                {
+                    // Same auto-shape table the populated path uses, so clearing the last row
+                    // leaves exactly the same matrix the user saw before.
+                    _layout = WindowMonitor.ComputeLayout(_reservedCells, 0, 0);
+                    _cellProgram = new string[_layout.Length];
+                    _cellDisplay = new string[_layout.Length];
+                }
+                else
+                {
+                    _layout = new WindowMonitor.CellRect[0];
+                }
                 return;
             }
 
-            WindowMonitor.ResolveLayout(_names, _rows, _cols, _slots, out _layout, out int[] cells);
+            WindowMonitor.ResolveLayout(_names, _rows, _cols, _slots, out _layout, out int[] cells,
+                                        _reservedCells, _emptyCells);
 
             _cellProgram = new string[_layout.Length];
+            _cellDisplay = new string[_layout.Length];
             for (int i = 0; i < cells.Length && i < _names.Count; i++)
             {
                 int cell = cells[i];
+                // A disabled Arrange row is sent as "" so its cell stays reserved but empty
+                // (same placeholder the runtime resolver produces). Only real programs claim
+                // a filled tile.
+                if (string.IsNullOrWhiteSpace(_names[i]))
+                    continue;
                 // First program wins a cell, matching the old FindProgram scan order.
                 if (cell >= 0 && cell < _cellProgram.Length && _cellProgram[cell] == null)
+                {
                     _cellProgram[cell] = _names[i];
+                    _cellDisplay[cell] = i < _displayNames.Count && !string.IsNullOrWhiteSpace(_displayNames[i])
+                        ? _displayNames[i]
+                        : _names[i];
+                }
             }
         }
 
@@ -173,16 +254,15 @@ namespace TileKeeper.Class
         {
             base.OnPaint(e);
 
-            // No programs selected for this screen: nothing is tiled, so show a single
-            // "0" placeholder instead of the "1" that ComputeLayout's Math.Max(1, n)
-            // would otherwise produce.
-            if (_names.Count == 0)
+            // No layout at all (no programs and no explicit grid): show a single "0"
+            // placeholder instead of the "1" that ComputeLayout's Math.Max(1, n) would
+            // otherwise produce. With an explicit grid, _layout holds the gray empty cells
+            // and the normal loop below paints them.
+            if (_layout.Length == 0)
             {
                 DrawEmptyState(e.Graphics);
                 return;
             }
-
-            if (_layout.Length == 0) return;
 
             Font labelFont = LabelFont;
             const int pad = 6;
@@ -199,14 +279,19 @@ namespace TileKeeper.Class
 
                 int palette = i % CellColors.Length;
                 bool occupied = _cellProgram[i] != null;
+                // In an explicit grid every unassigned cell is neutral gray, whether the
+                // screen has zero programs or some cells are still free. Auto layouts keep
+                // the old light-tint placeholder for a disabled Arrange row.
+                bool fixedGrid = _rows > 0 && _cols > 0 && !occupied;
 
-                e.Graphics.FillRectangle(occupied ? FilledBrushes[palette] : EmptyBrushes[palette], rect);
+                e.Graphics.FillRectangle(occupied ? FilledBrushes[palette]
+                                            : fixedGrid ? UnassignedBrush : EmptyBrushes[palette], rect);
 
                 TextRenderer.DrawText(e.Graphics, (i + 1).ToString(), labelFont, rect,
-                    occupied ? Color.White : EmptyTextColors[palette],
+                    occupied ? Color.White : fixedGrid ? UnassignedText : EmptyTextColors[palette],
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 
-                e.Graphics.DrawRectangle(CellPens[palette], rect);
+                e.Graphics.DrawRectangle(fixedGrid ? UnassignedPen : CellPens[palette], rect);
             }
         }
 
@@ -261,8 +346,10 @@ namespace TileKeeper.Class
                 return;
             }
 
-            string program = _cellProgram[cell];
-            string label = "Cell " + (cell + 1) + ": " + (program ?? "(empty)");
+            string program = cell < _cellDisplay.Length ? _cellDisplay[cell] : null;
+            if (string.IsNullOrWhiteSpace(program) && cell < _cellProgram.Length)
+                program = _cellProgram[cell];
+            string label = "Cell " + (cell + 1) + ": " + (string.IsNullOrWhiteSpace(program) ? "(empty)" : program);
             if (label == _tooltipCell)
                 return;
 
@@ -274,7 +361,7 @@ namespace TileKeeper.Class
         private int HitCell(int x, int y)
         {
             if (_layout.Length == 0 || Width <= 0 || Height <= 0)
-                return -1; // no programs → the placeholder "0" tile is not clickable
+                return -1; // only the auto-mode "0" placeholder is not clickable
 
             double fx = x / (double)Width;
             double fy = y / (double)Height;
