@@ -28,7 +28,7 @@ namespace TileKeeper.Class
         public sealed class Entry
         {
             public Entry(string key, string baseName, string baseArgs,
-                         bool matchLargestWindow, bool positionOnly, bool enabled)
+                         bool matchLargestWindow, bool positionOnly, bool enabled, string id = null)
             {
                 Key = key ?? "";
                 BaseName = baseName ?? "";
@@ -36,7 +36,11 @@ namespace TileKeeper.Class
                 MatchLargestWindow = matchLargestWindow;
                 PositionOnly = positionOnly;
                 Enabled = enabled;
+                Id = id ?? "";
             }
+
+            /// <summary>Persistent row identity. When a screen key is an id it resolves here first.</summary>
+            public string Id { get; }
 
             public string Key { get; }
             public string BaseName { get; }
@@ -53,6 +57,9 @@ namespace TileKeeper.Class
             public List<string> Args { get; } = new List<string>();
             public List<bool> MatchLargest { get; } = new List<bool>();
             public List<int> KeptIndexes { get; } = new List<int>();
+
+            /// <summary>Persistent id of the row each key resolved to ("" for unknown legacy keys).</summary>
+            public List<string> MatchedIds { get; } = new List<string>();
         }
 
         public static Resolved Resolve(IList<string> keys, IList<Entry> entries)
@@ -61,6 +68,7 @@ namespace TileKeeper.Class
             if (keys == null)
                 return resolved;
 
+            var byId = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
             var byKey = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
             var byBase = new Dictionary<string, List<Entry>>(StringComparer.OrdinalIgnoreCase);
 
@@ -70,6 +78,11 @@ namespace TileKeeper.Class
                 {
                     if (entry == null)
                         continue;
+
+                    // Persistent ids are authoritative: two rows may share a name/args, but
+                    // only one of them owns a given screen assignment.
+                    if (!string.IsNullOrWhiteSpace(entry.Id) && !byId.ContainsKey(entry.Id))
+                        byId[entry.Id] = entry;
 
                     if (!string.IsNullOrWhiteSpace(entry.Key))
                     {
@@ -95,14 +108,32 @@ namespace TileKeeper.Class
                 if (string.IsNullOrWhiteSpace(key))
                     continue;
 
-                Entry match = Find(byKey, byBase, key);
+                Entry match = byId.TryGetValue(key, out Entry byIdentity) ? byIdentity
+                                                                          : Find(byKey, byBase, key);
 
-                // A disabled Arrange row never reaches WindowMonitor, even through a stale
-                // key that only matched via BaseName.
+                // A legacy screen assignment may still carry a Keep Running id. Follow its
+                // Arrange mirror so the positioning switch, not the launch switch, decides.
+                if (match != null && !match.PositionOnly
+                    && !string.IsNullOrWhiteSpace(match.Key)
+                    && byKey.TryGetValue(match.Key, out Entry positionTwin)
+                    && positionTwin.PositionOnly)
+                    match = positionTwin;
+
+                // A disabled Arrange row stays in the grid as an empty placeholder. Dropping it
+                // shrinks the program count (4→3) and ComputeLayout stretched the remaining
+                // tiles across the freed row; the cell must stay empty instead.
                 if (match != null && match.PositionOnly && !match.Enabled)
+                {
+                    resolved.KeptIndexes.Add(i);
+                    resolved.MatchedIds.Add(match.Id);
+                    resolved.Programs.Add("");
+                    resolved.Args.Add("");
+                    resolved.MatchLargest.Add(false);
                     continue;
+                }
 
                 resolved.KeptIndexes.Add(i);
+                resolved.MatchedIds.Add(match?.Id ?? "");
                 if (match != null)
                 {
                     resolved.Programs.Add(match.BaseName);

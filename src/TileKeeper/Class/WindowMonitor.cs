@@ -26,18 +26,28 @@ namespace TileKeeper.Class
         public int Rows;                  // 0 = auto rows
         public int Cols;                  // 0 = auto cols
         public int[] Slots;               // Parallel to Programs; -1 or any value ≥ grid size = auto-fill
+        /// <summary>Highest pinned cell + 1. Reserves cells of unchecked rows in an auto grid.</summary>
+        public int ReservedCells;
+        /// <summary>
+        /// Cells the user deliberately cleared. They stay in the layout but are never
+        /// auto-filled, so their neighbours keep their numbers after Save/reload too.
+        /// </summary>
+        public int[] EmptyCells;
 
         public ScreenAssignment(List<string> programs, bool autoFit, int rows, int cols, int[] slots,
-            List<string> args = null, List<bool> matchLargest = null, bool borderless = true)
+            List<string> args = null, List<bool> matchLargest = null, bool borderless = true,
+            int reservedCells = 0, int[] emptyCells = null)
         {
-            Programs     = programs ?? new List<string>();
-            Args         = args ?? new List<string>();
-            MatchLargest = matchLargest ?? new List<bool>();
-            AutoFit      = autoFit;
-            Borderless   = borderless;
-            Rows         = rows;
-            Cols         = cols;
-            Slots        = slots;
+            Programs      = programs ?? new List<string>();
+            Args          = args ?? new List<string>();
+            MatchLargest  = matchLargest ?? new List<bool>();
+            AutoFit       = autoFit;
+            Borderless    = borderless;
+            Rows          = rows;
+            Cols          = cols;
+            Slots         = slots;
+            ReservedCells = reservedCells;
+            EmptyCells    = emptyCells;
         }
     }
 
@@ -172,7 +182,9 @@ namespace TileKeeper.Class
                 var cells = new int[n][];
                 for (int s = 0; s < n; s++)
                     if (detected[s])
-                        ResolveLayout(assignments[s].Programs, assignments[s].Rows, assignments[s].Cols, assignments[s].Slots, out layout[s], out cells[s]);
+                        ResolveLayout(assignments[s].Programs, assignments[s].Rows, assignments[s].Cols,
+                                      assignments[s].Slots, out layout[s], out cells[s],
+                                      assignments[s].ReservedCells, assignments[s].EmptyCells);
 
                 // One EnumWindows pass only when any configured program opts into MatchLargest
                 // (the common case — nothing opts in — needs no top-level enumeration at all;
@@ -456,17 +468,48 @@ namespace TileKeeper.Class
         /// if two programs claim the same tile, the first keeps it and the later one is
         /// auto-filled. All remaining (slot -1/out-of-range) programs auto-fill the first
         /// free tile in list order. If the layout is too small for the program count the
-        /// leftovers wrap with modulo so nothing crashes.
+        /// leftovers wrap with modulo so nothing crashes. With an explicit rows×cols grid,
+        /// the layout is padded to the full cell count so unassigned cells stay empty instead
+        /// of letting a mapped program stretch into them.
         /// </summary>
-        internal static void ResolveLayout(List<string> programs, int rows, int cols, int[] slots, out CellRect[] layout, out int[] cells)
+        internal static void ResolveLayout(List<string> programs, int rows, int cols, int[] slots,
+                                           out CellRect[] layout, out int[] cells, int reservedCells = 0,
+                                           ICollection<int> emptyCells = null)
         {
             int n = programs != null ? programs.Count : 0;
-            layout = ComputeLayout(n, rows, cols);
+
+            // An explicit grid reserves every cell, not just the ones with a program. Without
+            // this, 2x2 with one mapped app collapsed to one full-screen tile and stretched the
+            // app into the three unassigned areas. Padding with empty entries keeps each pinned
+            // app in its own cell and leaves unassigned cells genuinely empty (gray in the
+            // preview, untouched at runtime). An auto grid (0×0) reserves the highest pinned
+            // cell too, so unchecking a row cannot collapse the shape into a smaller one.
+            int fixedCells = rows > 0 && cols > 0 ? rows * cols : Math.Max(0, reservedCells);
+            int count = Math.Max(n, fixedCells);
+
+            layout = ComputeLayout(count, rows, cols);
             int total = layout.Length;
-            cells = new int[n];
-            if (n == 0) return;
+            cells = new int[count];
+            // Padding entries (an explicit grid has more cells than mapped programs) must start
+            // unassigned. Default 0 made them look like a program already pinned to cell 1, so
+            // the auto-fill pass skipped them and the real gap never got filled.
+            for (int i = 0; i < count; i++)
+                cells[i] = -1;
+            if (count == 0) return;
 
             var occupied = new bool[total];
+            // A cell cleared by "Clear this cell (leave empty)" must stay empty even after a
+            // Save/reload: mark it occupied up front so the auto-fill pass cannot hand it to a
+            // different program. Explicit smaller grids simply ignore out-of-range indexes.
+            var blocked = new bool[total];
+            if (emptyCells != null)
+                foreach (int cell in emptyCells)
+                    if (cell >= 0 && cell < total)
+                    {
+                        blocked[cell] = true;
+                        occupied[cell] = true;
+                    }
+
             for (int i = 0; i < n; i++)
             {
                 int slot = (slots != null && i < slots.Length) ? slots[i] : -1;
@@ -482,15 +525,20 @@ namespace TileKeeper.Class
             }
 
             int next = 0;
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < count; i++)
             {
                 if (cells[i] >= 0) continue;
 
                 while (next < total && occupied[next]) next++;
                 if (next >= total)
                 {
-                    cells[i] = total > 0 ? i % total : 0; // Layout too small for the list — wrap (old modulo behaviour)
-                    occupied[cells[i]] = true;
+                    // More programs than free cells: wrap (old modulo behaviour), but never
+                    // wrap into a cell the user deliberately left empty.
+                    int wrapped = total > 0 ? i % total : 0;
+                    for (int step = 0; step < total && blocked[wrapped]; step++)
+                        wrapped = (wrapped + 1) % total;
+                    cells[i] = wrapped;
+                    occupied[wrapped] = true;
                     continue;
                 }
 

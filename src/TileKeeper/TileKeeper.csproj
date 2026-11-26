@@ -110,6 +110,7 @@
     <Compile Include="Class\ProgramEnableFlags.cs" />
     <Compile Include="Class\LaunchTargets.cs" />
     <Compile Include="Class\PositionTargets.cs" />
+    <Compile Include="Class\ProgramCatalog.cs" />
     <Compile Include="Class\UpdateChecker.cs" />
     <Compile Include="TileKeeperForm.cs">
       <SubType>Form</SubType>

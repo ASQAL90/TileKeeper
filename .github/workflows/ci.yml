@@ -36,8 +36,10 @@ jobs:
             -Uri "https://www.nuget.org/api/v2/package/NUnit.ConsoleRunner/$version" `
             -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath $out -Force
+          # ScreenListRenderTests instantiate WinForms forms and can hang in headless CI.
           & (Join-Path $out 'tools\nunit3-console.exe') 'tests\bin\Release\TileKeeper.Tests.dll' `
-            --result=TestResult.xml --labels=Before --inprocess
+            --where "class!=TileKeeper.Tests.ScreenListRenderTests" `
+            --result=TestResult.xml --labels=Before --timeout=120000
           if ($LASTEXITCODE -ne 0) {
             throw "Test gagal (exit code $LASTEXITCODE)."
           }

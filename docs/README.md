@@ -1,6 +1,8 @@
 # TileKeeper documentation
 
 - [`USER_GUIDE.md`](USER_GUIDE.md) — complete Markdown user guide.
+- [`SUPPORTED-FILES.md`](SUPPORTED-FILES.md) — file types, association-based support plan, and limits.
+- [`release-notes/1.2.2.md`](release-notes/1.2.2.md) — changes and Windows test checklist for v1.2.2.
 - [`user-guide.html`](user-guide.html) — detailed, standalone HTML guide with quick start, plain-language explanations, responsive navigation, visual UI mockups, troubleshooting, and glossary.
 - [`TileKeeper-architecture.pptx`](TileKeeper-architecture.pptx) — 20-slide beginner-friendly tutorial and architecture presentation, including four dedicated visual-example slides.
 - [`create_presentation.py`](create_presentation.py) — reproducible 16-slide base presentation generator; run with `uv run --with python-pptx python docs/create_presentation.py`, then run the illustration script.

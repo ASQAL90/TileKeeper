@@ -96,8 +96,11 @@ namespace TileKeeper.Tests
             var resolved = PositionTargets.Resolve(
                 new[] { "viewer.exe (192.0.2.10:5900)", "notepad.exe" }, entries);
 
-            Assert.That(resolved.Programs, Is.EqualTo(new[] { "notepad.exe" }));
-            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 1 }),
+            // A disabled Arrange row stays as an empty placeholder so the grid layout does not
+            // collapse and stretch remaining windows across its freed cell.
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "", "notepad.exe" }));
+            Assert.That(resolved.Args, Is.EqualTo(new[] { "", "" }));
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0, 1 }),
                 "slot indexes must still refer to the original key positions");
         }
 
@@ -114,8 +117,9 @@ namespace TileKeeper.Tests
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe (host:1)" }, entries);
 
-            Assert.That(resolved.Programs, Is.Empty);
-            Assert.That(resolved.KeptIndexes, Is.Empty);
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "" }),
+                "disabled Arrange row becomes an empty placeholder, not a positioned window");
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0 }));
         }
 
         [Test]
@@ -148,8 +152,9 @@ namespace TileKeeper.Tests
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
 
-            Assert.That(resolved.Programs, Is.Empty,
-                "a stale bare-name key must still honour the disabled Arrange row");
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "" }),
+                "a stale bare-name key must still honour the disabled Arrange row as a placeholder");
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0 }));
         }
 
         [Test]
@@ -162,9 +167,9 @@ namespace TileKeeper.Tests
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
 
-            Assert.That(resolved.Programs, Is.Empty,
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "" }),
                 "a stale bare-name key must not resurrect a disabled Arrange row");
-            Assert.That(resolved.KeptIndexes, Is.Empty);
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0 }));
         }
 
         [Test]
@@ -211,6 +216,35 @@ namespace TileKeeper.Tests
         }
 
         [Test]
+        public void BuildRemovalAliases_BareKey_IncludesLegacyBareName()
+        {
+            var aliases = ProgramCatalog.BuildRemovalAliases("viewer.exe", "viewer.exe", "viewer.exe", "");
+
+            Assert.That(aliases, Does.Contain("viewer.exe"));
+            Assert.That(aliases, Does.Contain("viewer.exe (no args)"));
+        }
+
+        [Test]
+        public void BuildRemovalAliases_DisambiguatedKey_DoesNotIncludeBareName()
+        {
+            var aliases = ProgramCatalog.BuildRemovalAliases(
+                "viewer.exe (host:1)", "viewer.exe (host:1)", "viewer.exe", "host:1");
+
+            Assert.That(aliases, Does.Contain("viewer.exe (host:1)"));
+            Assert.That(aliases, Does.Not.Contain("viewer.exe"));
+        }
+
+        [Test]
+        public void BuildRemovalAliases_QuotedArguments_KeepExactText()
+        {
+            var aliases = ProgramCatalog.BuildRemovalAliases(
+                "app.exe (\"C:\\Program Files\\x\")", "app.exe (\"C:\\Program Files\\x\")",
+                "app.exe", "\"C:\\Program Files\\x\"");
+
+            Assert.That(aliases, Does.Contain("app.exe (\"C:\\Program Files\\x\")"));
+        }
+
+        [Test]
         public void Resolve_EmptyKeys_ReturnsEmptyLists()
         {
             var resolved = PositionTargets.Resolve(null, new List<PositionTargets.Entry>());
@@ -219,6 +253,67 @@ namespace TileKeeper.Tests
             Assert.That(resolved.Args, Is.Empty);
             Assert.That(resolved.MatchLargest, Is.Empty);
             Assert.That(resolved.KeptIndexes, Is.Empty);
+        }
+
+        [Test]
+        public void Resolve_ById_DistinguishesRowsWithIdenticalNames()
+        {
+            var entries = new List<PositionTargets.Entry>
+            {
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, false, true, "id-a"),
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, true, true, "id-b"),
+            };
+
+            var resolved = PositionTargets.Resolve(new[] { "id-b" }, entries);
+
+            Assert.That(resolved.MatchedIds, Is.EqualTo(new[] { "id-b" }));
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "viewer.exe" }));
+        }
+
+        [Test]
+        public void Catalog_SurvivingDuplicateKeepsItsIdAfterRemoval()
+        {
+            var catalog = new ProgramCatalog();
+            var first = catalog.Add("viewer.exe host:1", "", false, false, true);
+            var second = catalog.Add("viewer.exe host:1", "", true, false, true);
+            catalog.Rekey();
+            string removedId = first.Id;
+            string survivingId = second.Id;
+
+            catalog.RemoveIds(new[] { removedId });
+
+            Assert.That(catalog.GetById(removedId), Is.Null);
+            Assert.That(catalog.GetById(survivingId), Is.SameAs(second));
+            Assert.That(second.Id, Is.EqualTo(survivingId));
+        }
+
+        [Test]
+        public void MigrateTokens_LegacyKeyToId_PreservesUnknownTokenAndExistingId()
+        {
+            var entries = new List<PositionTargets.Entry>
+            {
+                new PositionTargets.Entry("viewer.exe (host:1)", "viewer.exe", "host:1", false, false, true, "id-a"),
+                new PositionTargets.Entry("viewer.exe (host:2)", "viewer.exe", "host:2", false, true, true, "id-b"),
+            };
+            var known = new HashSet<string> { "id-a", "id-b" };
+
+            var migrated = ProgramCatalog.MigrateTokens(
+                new[] { "viewer.exe (host:1)", "legacy.exe", "id-b" }, entries, known);
+
+            Assert.That(migrated, Is.EqualTo(new[] { "id-a", "legacy.exe", "id-b" }));
+        }
+
+        [Test]
+        public void RemoveIdsFromTokens_ClearsOnlyRemovedRowAndKeepsSlotsAligned()
+        {
+            ProgramCatalog.RemoveIdsFromTokens(
+                new[] { "id-a", "legacy.exe", "id-b" },
+                new HashSet<string> { "id-a" },
+                new[] { 0, 1, 2 },
+                out List<string> kept, out List<int> slots);
+
+            Assert.That(kept, Is.EqualTo(new[] { "legacy.exe", "id-b" }));
+            Assert.That(slots, Is.EqualTo(new[] { 1, 2 }));
         }
     }
 }
