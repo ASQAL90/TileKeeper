@@ -50,7 +50,7 @@
 <body>
 <main class="wrap">
   <header>
-    <h1>TileKeeper<span class="tag">v1.2.0</span></h1>
+    <h1>TileKeeper<span class="tag">v1.2.2</span></h1>
     <p class="tagline">A Windows tray utility that keeps selected programs running and restores their windows to the monitors and grid cells you chose.</p>
     <div class="buttons">
       <a class="btn primary" href="https://github.com/asqal90/TileKeeper/releases/latest/download/TileKeeper-win.zip">Download for Windows</a>
@@ -60,13 +60,13 @@
   </header>
 
   <section>
-    <h2>What's new in v1.2.0<span class="tag">latest</span></h2>
+    <h2>What's new in v1.2.2<span class="tag">latest</span></h2>
     <ul>
-      <li><strong>Enable</strong> changes apply on the next scan, with no Save needed. Running apps are not closed.</li>
-      <li>Adding an app in <strong>Keep Apps Running</strong> also adds it to <strong>Arrange Windows</strong>; after that the two lists are independent.</li>
-      <li><strong>Remove</strong> also clears the program from every screen list, so no stale entries remain.</li>
-      <li><strong>Edit</strong> was removed; point a row at a new file by removing it and adding the new one.</li>
-      <li>The Arrange Windows list shows about six rows, and a double-click on the tray icon opens the window instantly.</li>
+      <li><strong>Checkbox clicks only</strong>: in Keep Apps Running and Arrange Windows, a checkbox changes only when you click the checkbox glyph. Drag-select, marquee, and row clicks no longer toggle checks.</li>
+      <li><strong>Stable grid cells</strong>: Rows/Cols stay in the 1&ndash;3 range with auto-grow when needed, cell numbers stay stable when rows are unchecked, and reserved empty cells are filled by the smallest empty cell index first.</li>
+      <li><strong>Clear cell / unsaved changes</strong>: "Clear this cell (leave empty)" keeps the matrix shape; closing with unsaved changes asks Save/Don't Save/Cancel, and <strong>Don't Save</strong> discards changes and reloads the last saved config.</li>
+      <li><strong>Tray and window fixes</strong>: X hides to tray, restore from tray shows the full window reliably, grid map hover shows app names only, and long cell menus no longer overflow.</li>
+      <li><strong>Stable program identity</strong>: screen assignments and grid pins use persistent program IDs, so duplicate rows and remove/add flows do not steal or duplicate assignments.</li>
     </ul>
   </section>
 
