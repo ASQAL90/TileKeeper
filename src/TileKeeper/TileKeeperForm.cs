@@ -1562,30 +1562,12 @@ namespace TileKeeper
         }
 
         /// <summary>
-        /// Identity strings a removed row can be stored under in ScreenN. Exposed as a pure
-        /// helper so the odd argument/quote/.lnk cases can be regression-tested without a form.
+        /// Identity strings a removed row can be stored under in ScreenN. Pure helper so odd
+        /// argument/quote/.lnk cases can be regression-tested without a Form.
         /// </summary>
         internal static HashSet<string> BuildRemovalAliases(string name, string key,
                                                              string baseName, string baseArgs)
-        {
-            var aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            void Add(string value)
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    aliases.Add(value.Trim());
-            }
-
-            Add(name);
-            Add(key);
-            Add($"{baseName} ({(string.IsNullOrEmpty(baseArgs) ? "no args" : baseArgs)})");
-
-            // Only a row whose key is the bare exe may claim legacy bare-name entries;
-            // a disambiguated row must not delete the other shortcut's screen assignment.
-            if (string.Equals(key, baseName, StringComparison.OrdinalIgnoreCase))
-                Add(baseName);
-
-            return aliases;
-        }
+            => ProgramCatalog.BuildRemovalAliases(name, key, baseName, baseArgs);
 
         private void PopulateScreen(CheckedListBox chk, List<string> candidates, ISet<string> checkedSet)
         {

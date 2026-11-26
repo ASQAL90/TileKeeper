@@ -124,6 +124,32 @@ namespace TileKeeper.Class
             string.Join(",", (entries ?? Enumerable.Empty<ProgramEntry>()).Select(e => e.Id));
 
         /// <summary>
+        /// Identity strings a removed row can be stored under in ScreenN. Pure helper so
+        /// odd argument/quote/.lnk cases can be regression-tested without a Form.
+        /// </summary>
+        public static HashSet<string> BuildRemovalAliases(string name, string key,
+                                                           string baseName, string baseArgs)
+        {
+            var aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            void Add(string value)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    aliases.Add(value.Trim());
+            }
+
+            Add(name);
+            Add(key);
+            Add($"{baseName} ({(string.IsNullOrEmpty(baseArgs) ? "no args" : baseArgs)})");
+
+            // Only a row whose key is the bare exe may claim legacy bare-name entries;
+            // a disambiguated row must not delete the other shortcut's screen assignment.
+            if (string.Equals(key, baseName, StringComparison.OrdinalIgnoreCase))
+                Add(baseName);
+
+            return aliases;
+        }
+
+        /// <summary>
         /// Translates legacy ScreenN tokens (bare name, "Base (args)" key, or already an id)
         /// into persistent ids. Unknown tokens are preserved so a stale assignment is never
         /// silently dropped. Slots stay positionally parallel.

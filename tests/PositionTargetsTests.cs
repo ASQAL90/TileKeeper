@@ -213,7 +213,7 @@ namespace TileKeeper.Tests
         [Test]
         public void BuildRemovalAliases_BareKey_IncludesLegacyBareName()
         {
-            var aliases = TileKeeperForm.BuildRemovalAliases("viewer.exe", "viewer.exe", "viewer.exe", "");
+            var aliases = ProgramCatalog.BuildRemovalAliases("viewer.exe", "viewer.exe", "viewer.exe", "");
 
             Assert.That(aliases, Does.Contain("viewer.exe"));
             Assert.That(aliases, Does.Contain("viewer.exe (no args)"));
@@ -222,7 +222,7 @@ namespace TileKeeper.Tests
         [Test]
         public void BuildRemovalAliases_DisambiguatedKey_DoesNotIncludeBareName()
         {
-            var aliases = TileKeeperForm.BuildRemovalAliases(
+            var aliases = ProgramCatalog.BuildRemovalAliases(
                 "viewer.exe (host:1)", "viewer.exe (host:1)", "viewer.exe", "host:1");
 
             Assert.That(aliases, Does.Contain("viewer.exe (host:1)"));
@@ -232,7 +232,7 @@ namespace TileKeeper.Tests
         [Test]
         public void BuildRemovalAliases_QuotedArguments_KeepExactText()
         {
-            var aliases = TileKeeperForm.BuildRemovalAliases(
+            var aliases = ProgramCatalog.BuildRemovalAliases(
                 "app.exe (\"C:\\Program Files\\x\")", "app.exe (\"C:\\Program Files\\x\")",
                 "app.exe", "\"C:\\Program Files\\x\"");
 
