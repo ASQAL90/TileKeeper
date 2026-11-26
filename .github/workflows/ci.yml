@@ -37,7 +37,7 @@ jobs:
             -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath $out -Force
           & (Join-Path $out 'tools\nunit3-console.exe') 'tests\bin\Release\TileKeeper.Tests.dll' `
-            --result=TestResult.xml --labels=Before --inprocess
+            --result=TestResult.xml --labels=Before --inprocess --timeout=120000
           if ($LASTEXITCODE -ne 0) {
             throw "Test gagal (exit code $LASTEXITCODE)."
           }
