@@ -96,8 +96,11 @@ namespace TileKeeper.Tests
             var resolved = PositionTargets.Resolve(
                 new[] { "viewer.exe (192.0.2.10:5900)", "notepad.exe" }, entries);
 
-            Assert.That(resolved.Programs, Is.EqualTo(new[] { "notepad.exe" }));
-            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 1 }),
+            // A disabled Arrange row stays as an empty placeholder so the grid layout does not
+            // collapse and stretch remaining windows across its freed cell.
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "", "notepad.exe" }));
+            Assert.That(resolved.Args, Is.EqualTo(new[] { "", "" }));
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0, 1 }),
                 "slot indexes must still refer to the original key positions");
         }
 
@@ -114,8 +117,9 @@ namespace TileKeeper.Tests
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe (host:1)" }, entries);
 
-            Assert.That(resolved.Programs, Is.Empty);
-            Assert.That(resolved.KeptIndexes, Is.Empty);
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "" }),
+                "disabled Arrange row becomes an empty placeholder, not a positioned window");
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0 }));
         }
 
         [Test]
@@ -148,8 +152,9 @@ namespace TileKeeper.Tests
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
 
-            Assert.That(resolved.Programs, Is.Empty,
-                "a stale bare-name key must still honour the disabled Arrange row");
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "" }),
+                "a stale bare-name key must still honour the disabled Arrange row as a placeholder");
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0 }));
         }
 
         [Test]
@@ -162,9 +167,9 @@ namespace TileKeeper.Tests
 
             var resolved = PositionTargets.Resolve(new[] { "viewer.exe" }, entries);
 
-            Assert.That(resolved.Programs, Is.Empty,
+            Assert.That(resolved.Programs, Is.EqualTo(new[] { "" }),
                 "a stale bare-name key must not resurrect a disabled Arrange row");
-            Assert.That(resolved.KeptIndexes, Is.Empty);
+            Assert.That(resolved.KeptIndexes, Is.EqualTo(new[] { 0 }));
         }
 
         [Test]
